@@ -5,7 +5,6 @@ export class ParseContext {
     #view: DataView;
 
     constructor(view: DataView, byteOffset: number) {
-
         this.#byteOffset = byteOffset;
         this.#view = view;
     }
@@ -148,4 +147,20 @@ export function attempt<T>(p: Parser<T>): Parser<T | Error> {
             return e;
         }
     };
-}; 
+};
+
+export function aligned<T>(p: Parser<T>, alignment: number): Parser<T> {
+    return ctx => {
+        const offset = ctx.byteOffset;
+        const result = p(ctx);
+        const consumed = ctx.byteOffset - offset;
+        const aligned = Math.floor(Math.ceil(consumed / alignment) * alignment);
+        let rest = aligned - consumed;
+        while (rest > 0) {
+            ctx.takeUint8();
+            rest -= 1;
+        }
+        return result;
+    };
+}
+

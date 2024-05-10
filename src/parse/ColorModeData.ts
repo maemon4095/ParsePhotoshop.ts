@@ -1,7 +1,7 @@
 import { ColorMode, FileHeader } from "~/parse/FileHeader.ts";
 import { ParseContext } from "~/util/parse/mod.ts";
 
-export function parse(ctx: ParseContext, fileHeader: FileHeader) {
+export function parse(ctx: ParseContext, fileHeader: FileHeader): ColorModeData {
     const length = ctx.peekUint32();
     switch (fileHeader.colorMode) {
         case ColorMode.Bitmap:
@@ -23,12 +23,17 @@ export function parse(ctx: ParseContext, fileHeader: FileHeader) {
             // Duotone color specification is not documented. image are treated as a gray image.
             break;
     }
-
-
-
+    ctx.takeUint32();
+    const data = ctx.takeUint8Array(length);
+    return { data };
 }
 
-const IndexedColorModeDataLength = 768;
+/** The second section of PSD/PSB */
+export type ColorModeData = {
+    data: Uint8Array;
+};
+
+export const IndexedColorModeDataLength = 768;
 
 export class ColorModeDataMustBeEmptyError extends Error {
     readonly offset: number;

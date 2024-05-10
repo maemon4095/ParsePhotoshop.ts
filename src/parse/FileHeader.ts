@@ -140,6 +140,7 @@ function parseColorMode(ctx: ParseContext): ColorMode {
     return mode;
 }
 
+/** The first section of PSD/PSB. */
 export type FileHeader = {
     version: Version;
     /** Channel count in the image, including any alpha channels. Supported range is 1 to 56. */
