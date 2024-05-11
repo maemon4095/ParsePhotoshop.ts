@@ -1,7 +1,9 @@
 {
-  "compilerOptions": {
+  "tasks": {
+    "build": "deno run -A build.ts"
   },
   "imports": {
-    "~/": "./src/"
+    "~/": "./src/",
+    "$/": "./"
   }
 }

@@ -13,4 +13,5 @@ export function parse(buffer: ArrayBuffer) {
     const colorModeData = parseColorModeData(ctx, fileHeader);
     console.log("ColorModeData:", colorModeData);
     const imageResources = parseImageResources(ctx);
+    console.log("imageResources:", imageResources);
 }

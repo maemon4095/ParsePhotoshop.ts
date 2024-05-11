@@ -1,15 +1,13 @@
-import { ParseContext } from "~/util/parse/mod.ts";
+import { ParseContext, measured } from "~/util/parse/mod.ts";
 import { parse as parseBlock, ImageResourceBlock } from "~/parse/ImageResourceBlock.ts";
 
 export function parse(ctx: ParseContext): ImageResources {
     let rest = ctx.takeUint32();
     const blocks: ImageResourceBlock[] = [];
-
+    const measuredParseBlock = measured(parseBlock);
     while (rest > 0) {
-        const offset = ctx.byteOffset;
-        const block = parseBlock(ctx);
+        const [block, consumed] = measuredParseBlock(ctx);
         blocks.push(block);
-        const consumed = ctx.byteOffset - offset;
         rest -= consumed;
     }
 

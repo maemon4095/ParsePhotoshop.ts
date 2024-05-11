@@ -13,6 +13,24 @@ export class ParseContext {
         return this.#byteOffset;
     }
 
+    seekTo(byteOffset: number) {
+        this.#byteOffset = byteOffset;
+    }
+
+    advance(bytesMove: number) {
+        if (bytesMove === 0) {
+            return;
+        }
+
+        if (bytesMove < 0) {
+            this.#view.getUint8(this.#byteOffset + bytesMove + 1); // check cursor does not overflow
+            this.#byteOffset += bytesMove;
+        } else {
+            this.#view.getUint8(this.#byteOffset + bytesMove - 1); // check cursor does not overflow
+            this.#byteOffset += bytesMove;
+        }
+    }
+
     peekUint8Array(length: number): Uint8Array {
         const buf = new Uint8Array(length);
         const offset = this.#byteOffset;
@@ -52,10 +70,6 @@ export class ParseContext {
 
     peekInt64(le?: boolean): bigint {
         return this.#view.getBigInt64(this.#byteOffset, le);
-    }
-
-    peekFloat16(le?: boolean): number {
-        return this.#view.getFloat16(this.#byteOffset, le);
     }
 
     peekFloat32(le?: boolean): number {
@@ -120,12 +134,6 @@ export class ParseContext {
         return r;
     }
 
-    takeFloat16(le?: boolean): number {
-        const r = this.#view.getFloat16(this.#byteOffset, le);
-        this.#byteOffset += 2;
-        return r;
-    }
-
     takeFloat32(le?: boolean): number {
         const r = this.#view.getFloat32(this.#byteOffset, le);
         this.#byteOffset += 4;
@@ -141,10 +149,15 @@ export class ParseContext {
 
 export function attempt<T>(p: Parser<T>): Parser<T | Error> {
     return (ctx) => {
+        const byteOffset = ctx.byteOffset;
         try {
             return p(ctx);
         } catch (e) {
-            return e;
+            if (e instanceof Error) {
+                ctx.seekTo(byteOffset);
+                return e;
+            }
+            throw e;
         }
     };
 };
@@ -155,12 +168,16 @@ export function aligned<T>(p: Parser<T>, alignment: number): Parser<T> {
         const result = p(ctx);
         const consumed = ctx.byteOffset - offset;
         const aligned = Math.floor(Math.ceil(consumed / alignment) * alignment);
-        let rest = aligned - consumed;
-        while (rest > 0) {
-            ctx.takeUint8();
-            rest -= 1;
-        }
+        ctx.advance(aligned - consumed);
         return result;
     };
 }
 
+export function measured<T>(p: Parser<T>): Parser<[T, number]> {
+    return ctx => {
+        const offset = ctx.byteOffset;
+        const result = p(ctx);
+        const consumed = ctx.byteOffset - offset;
+        return [result, consumed];
+    };
+}
