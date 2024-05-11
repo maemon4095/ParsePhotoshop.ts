@@ -24,7 +24,7 @@ export function generateFunction<T>(cases: readonly (readonly [readonly T[], unk
                 if (sub instanceof DecisionTree) {
                     return [c, genTrie(depth + 1, sub)] as const;
                 } else {
-                    return [c, `return ${JSON.stringify(sub)};`] as const;
+                    return [c, `return ${sub};`] as const;
                 }
             }),
             defaultCaseCode
@@ -79,18 +79,18 @@ function generateTree<T>(cases: readonly (readonly [readonly T[], unknown])[]): 
 function generateSwitch<T>(char: string, cases: [T, string][], whenDefault?: string) {
     let code = `switch(${char}){`;
     for (const [c, p] of cases) {
-        code += `case ${JSON.stringify(c)}:${p};break;`;
+        code += `case ${JSON.stringify(c)}:${p}`;
     }
     if (whenDefault !== undefined) {
-        code += `default:${whenDefault};break;`;
+        code += `default:${whenDefault}`;
     }
     code += "}";
     return code;
 }
 
 class DecisionTree<T> {
-    #cases: Map<T, unknown>;
-    constructor(cases: Map<T, unknown>) {
+    #cases: Map<T, string | DecisionTree<T>>;
+    constructor(cases: Map<T, string | DecisionTree<T>>) {
         this.#cases = cases;
     }
 

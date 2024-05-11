@@ -1,17 +1,7 @@
 import { ParseContext, aligned } from "~/util/parse/mod.ts";
 import { parse as parsePascalString } from "~/parse/PascalString.ts";
 import { FileHeader, Version } from "~/parse/FileHeader.ts";
-import { createBinaryTable } from "~/util/bin/mod.ts";
-
-const blendModeTable = createBinaryTable([
-    "pass", "norm", "diss", "dark",
-    "mul ", "idiv", "lbrn", "dkCl",
-    "lite", "scrn", "div ", "lddg",
-    "lgCl", "over", "sLit", "hLit",
-    "vLit", "lLit", "pLit", "hMix",
-    "diff", "smud", "fsub", "fdiv",
-    "hue ", "sat ", "colr", "lum "
-] as const);
+import { parse as parseBlendMode } from "~/parse/BlendMode.gen.ts";
 
 export function parse(ctx: ParseContext, version: Version): LayerRecord {
     const containingRectangle = parseRect(ctx);
@@ -21,6 +11,7 @@ export function parse(ctx: ParseContext, version: Version): LayerRecord {
         channelInfos[i] = parseChannelInfo(ctx, version);
     }
     void parseBlendModeSigneture(ctx);
+    const mode = parseBlendMode(ctx);
 
     throw new Error("TODO");
 }
