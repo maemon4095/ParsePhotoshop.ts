@@ -1,5 +1,6 @@
 import { ColorMode, FileHeader } from "~/parse/FileHeader.ts";
 import { ParseContext } from "~/util/parse/mod.ts";
+import { SyntaxError } from "~/parse/SyntaxError.ts";
 
 export function parse(ctx: ParseContext, fileHeader: FileHeader): ColorModeData {
     const length = ctx.peekUint32();
@@ -35,20 +36,16 @@ export type ColorModeData = {
 
 export const IndexedColorModeDataLength = 768;
 
-export class ColorModeDataMustBeEmptyError extends Error {
-    readonly offset: number;
+export class ColorModeDataMustBeEmptyError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Color mode data must be empty when color mode is other than Indexed or Duotone.";
     }
 }
 
-export class ColorModeDataLengthMustBe768Error extends Error {
-    readonly offset: number;
+export class ColorModeDataLengthMustBe768Error extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = `Color mode data length must be ${IndexedColorModeDataLength} when color mode is Indexed.`;
     }
 }

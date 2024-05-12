@@ -1,5 +1,6 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 import { _trie } from "$/tools/GenerateTrie/mod.ts";
+import { SyntaxError } from "~/parse/SyntaxError.ts";
 
 export function parse(ctx: ParseContext) {
     const bin = ctx.peekUint8Array(4);
@@ -78,11 +79,9 @@ export enum BlendMode {
 }
 
 
-export class InvalidBlendModeError extends Error {
-    readonly offset: number;
+export class InvalidBlendModeError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Unexpected blend mode value.";
     }
 }

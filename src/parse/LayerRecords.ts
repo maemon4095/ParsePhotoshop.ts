@@ -1,10 +1,13 @@
-import { ParseContext, aligned } from "~/util/parse/mod.ts";
+import { ParseContext, aligned, measured } from "~/util/parse/mod.ts";
 import { parse as parsePascalString } from "~/parse/PascalString.ts";
 import { FileHeader, Version } from "~/parse/FileHeader.ts";
 import { parse as parseBlendMode } from "~/parse/BlendMode.gen.ts";
+import { parse as parseRect, Rectangle } from "~/parse/Rectangle.ts";
+import { parse as parseLayerMask } from "~/parse/LayerMask.ts";
+import { SyntaxError } from "~/parse/SyntaxError.ts";
 
-export function parse(ctx: ParseContext, version: Version): LayerRecord {
-    const containingRectangle = parseRect(ctx);
+export function parse(ctx: ParseContext, version: Version): LayerRecords {
+    const enclosingRectangle = parseRect(ctx);
     const channelCount = ctx.takeUint16();
     const channelInfos: ChannelInfo[] = new Array(channelCount);
     for (let i = 0; i < channelCount; ++i) {
@@ -22,13 +25,6 @@ export function parse(ctx: ParseContext, version: Version): LayerRecord {
     throw new Error("TODO");
 }
 
-function parseRect(ctx: ParseContext): Rectangle {
-    const top = ctx.takeUint32();
-    const left = ctx.takeUint32();
-    const bottom = ctx.takeUint32();
-    const right = ctx.takeUint32();
-    return { top, left, bottom, right };
-}
 
 function parseChannelInfo(ctx: ParseContext, version: Version): ChannelInfo {
     const id = ctx.peekUint16();
@@ -106,15 +102,8 @@ function parseFiller(ctx: ParseContext) {
     ctx.takeUint8();
 }
 
-export type LayerRecord = {
-    containingRectangle: Rectangle;
-};
-
-export type Rectangle = {
-    top: number;
-    left: number;
-    bottom: number;
-    right: number;
+export type LayerRecords = {
+    enclosingRectangle: Rectangle;
 };
 
 export type ChannelInfo = {
@@ -147,47 +136,37 @@ export enum LayerFlags {
     MasksHasParameters = 1 << 4,
 }
 
-export class InvalidChannelIdError extends Error {
-    readonly offset: number;
+export class InvalidChannelIdError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Channel is must be one of 0, 1, 2, -1, -2, -3";
     }
 }
 
-export class InvalidBlendModeSignetureError extends Error {
-    readonly offset: number;
+export class InvalidBlendModeSignetureError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Blend mode signeture must be `8BIM`";
     }
 }
 
-export class InvalidClippingModeError extends Error {
-    readonly offset: number;
+export class InvalidClippingModeError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Clipping mode must be 0(base) or 1(non-base).";
     }
 }
 
-export class InvalidLayerFlagsError extends Error {
-    readonly offset: number;
+export class InvalidLayerFlagsError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Layer flags must be in 0 to 31.";
     }
 }
 
-export class InvalidFillerError extends Error {
-    readonly offset: number;
+export class InvalidFillerError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Filler must be 0.";
     }
 }

@@ -1,5 +1,6 @@
 import { ParseContext, aligned } from "~/util/parse/mod.ts";
 import { parse as parsePascalString } from "~/parse/PascalString.ts";
+import { SyntaxError } from "~/parse/SyntaxError.ts";
 
 export function parse(ctx: ParseContext): ImageResourceBlock {
     void parseBlockSigneture(ctx);
@@ -45,11 +46,9 @@ export type ImageResourceBlock = {
     resourceData: Uint8Array;
 };
 
-export class InvalidImageResourceBlockSignetureError extends Error {
-    readonly offset: number;
+export class InvalidImageResourceBlockSignetureError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Image block signeture must be `8BIM`.";
     }
 }

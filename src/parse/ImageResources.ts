@@ -1,5 +1,6 @@
 import { ParseContext, measured } from "~/util/parse/mod.ts";
 import { parse as parseBlock, ImageResourceBlock } from "~/parse/ImageResourceBlock.ts";
+import { SyntaxError } from "~/parse/SyntaxError.ts";
 
 export function parse(ctx: ParseContext): ImageResources {
     let rest = ctx.takeUint32();
@@ -22,11 +23,9 @@ export type ImageResources = {
     blocks: ImageResourceBlock[];
 };
 
-export class InvalidImageResourceBlockOverflowError extends Error {
-    readonly offset: number;
+export class InvalidImageResourceBlockOverflowError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Image resource block overflows image resource section.";
     }
 }

@@ -1,4 +1,5 @@
 import { ParseContext } from "~/util/parse/mod.ts";
+import { SyntaxError } from "~/parse/SyntaxError.ts";
 
 export function parse(ctx: ParseContext): FileHeader {
     void parseSigneture(ctx);
@@ -177,78 +178,62 @@ export const PSDImageWidthMax = 30_000;
 export const PSBImageHeithtMax = 300_000;
 export const PSBImageWidthMax = 300_000;
 
-export class InvalidSignetureError extends Error {
-    readonly offset: number;
+export class InvalidSignetureError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "PSD file must have `8BPS` signeture.";
     }
 }
 
-export class InvalidVersionError extends Error {
-    readonly offset: number;
+export class InvalidVersionError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "PSD version must be 1 and PSB version must be 2";
     }
 }
 
-export class InvalidReservedAreaError extends Error {
-    readonly offset: number;
+export class InvalidReservedAreaError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Reserved area must be filled by 0.";
     }
 }
 
-export class InvalidChannelCountError extends Error {
-    readonly offset: number;
+export class InvalidChannelCountError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Channel count must be in 1 to 56.";
     }
 }
 
-export class InvalidHeightError extends Error {
-    readonly offset: number;
+export class InvalidHeightError extends SyntaxError {
     constructor(offset: number, version: Version) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = version === Version.PSD ?
             `PSD image height must be in 1 to ${PSDImageHeightMax}.`
             : `PSB image height must be in 1 to ${PSBImageHeithtMax}.`;
     }
 }
 
-export class InvalidWidthError extends Error {
-    readonly offset: number;
+export class InvalidWidthError extends SyntaxError {
     constructor(offset: number, version: Version) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = version === Version.PSD ?
             `PSD image width must be in 1 to ${PSDImageWidthMax}.`
             : `PSB image width must be in 1 to ${PSBImageWidthMax}.`;
     }
 }
 
-export class InvalidDepthError extends Error {
-    readonly offset: number;
+export class InvalidDepthError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Depth(bits per channel) must be one of 1, 8, 16 or 32.";
     }
 }
 
-export class InvalidColorModeError extends Error {
-    readonly offset: number;
+export class InvalidColorModeError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Color mode must be one of Bitmap(0), Grayscale(1), Indexed(2), RGB(3), CMYK(4), Multichannel(7), Duotone(8), Lab(9).";
     }
 }

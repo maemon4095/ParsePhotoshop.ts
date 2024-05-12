@@ -1,6 +1,6 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 import { Version } from "~/parse/FileHeader.ts";
-import { LayerRecord, parse as parseLayerRecord } from "~/parse/LayerRecord.ts";
+import { LayerRecords, parse as parseLayerRecord } from "~/parse/LayerRecords.ts";
 import { ChannelImageData, parse as parseImageData } from "~/parse/ChannelImageData.ts";
 
 export function parse(ctx: ParseContext, version: Version): LayerInfo {
@@ -22,7 +22,7 @@ export function parse(ctx: ParseContext, version: Version): LayerInfo {
         }
     })();
 
-    const layerRecords: LayerRecord[] = new Array(layerCount);
+    const layerRecords: LayerRecords[] = new Array(layerCount);
     for (let i = 0; i < layerCount; ++i) {
         const record = parseLayerRecord(ctx, version);
         layerRecords[i] = record;
@@ -47,6 +47,6 @@ export type LayerInfo = {
     sectionLength: bigint,
     isFirstLayerContainsTransparencyData: boolean,
     layerCount: number,
-    layerRecords: LayerRecord[];
+    layerRecords: LayerRecords[];
     imageData: ChannelImageData[];
 };

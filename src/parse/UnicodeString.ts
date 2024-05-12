@@ -1,4 +1,5 @@
 import { ParseContext } from "~/util/parse/mod.ts";
+import { SyntaxError } from "~/parse/SyntaxError.ts";
 
 /** Parse unicode string in PSD/PSB file. (UTF-16)*/
 export function parse(ctx: ParseContext) {
@@ -16,11 +17,9 @@ export function parse(ctx: ParseContext) {
     return text;
 }
 
-export class InvalidUnicodeStringError extends Error {
-    readonly offset: number;
+export class InvalidUnicodeStringError extends SyntaxError {
     constructor(offset: number) {
-        super();
-        this.offset = offset;
+        super(offset);
         this.message = "Unicode string must be 2-byte null terminated.";
     }
 }
