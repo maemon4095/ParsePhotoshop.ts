@@ -27,12 +27,11 @@ export class ParseContext {
             return;
         }
 
+        this.#byteOffset += bytesMove;
         if (bytesMove < 0) {
-            this.#view.getUint8(this.#byteOffset + bytesMove + 1); // check cursor does not overflow
-            this.#byteOffset += bytesMove;
+            this.#view.getUint8(this.#byteOffset + 1); // check cursor does not overflow
         } else {
-            this.#view.getUint8(this.#byteOffset + bytesMove - 1); // check cursor does not overflow
-            this.#byteOffset += bytesMove;
+            this.#view.getUint8(this.#byteOffset - 1); // check cursor does not overflow
         }
     }
 

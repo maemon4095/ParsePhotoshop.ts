@@ -1,8 +1,8 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 import { Version } from "~/parse/FileHeader.ts";
-import { parse as parseLayerInfo } from "~/parse/LayerInfo.ts";
+import { LayerInfo, parse as parseLayerInfo } from "~/parse/LayerInfo.ts";
 
-export function parse(ctx: ParseContext, version: Version) {
+export function parse(ctx: ParseContext, version: Version): LayerAndMaskInformation {
     const sectionSize = (() => {
         switch (version) {
             case Version.PSD:
@@ -13,9 +13,11 @@ export function parse(ctx: ParseContext, version: Version) {
     })();
 
     const layerInfo = parseLayerInfo(ctx, version);
+
+    throw new Error("TODO");
 }
 
 /** The fourth section of a Photoshop file */
-type LayerAndMaskInformation = {
-
+export type LayerAndMaskInformation = {
+    layerInfo: LayerInfo;
 };

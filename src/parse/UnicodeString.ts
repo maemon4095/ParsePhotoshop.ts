@@ -6,7 +6,6 @@ export function parse(ctx: ParseContext) {
     // [  count  ] [      units      ] [  null  ]
     //   2 byte      count * 2 bytes     2byte
     const unitCount = ctx.takeUint32();
-    console.log(unitCount);
     const buf = ctx.takeUint8Array(unitCount * 2);
     const decoder = new TextDecoder("utf-16be");
     const text = decoder.decode(buf);

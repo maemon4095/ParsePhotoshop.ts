@@ -1,28 +1,18 @@
-import { ParseContext, aligned } from "~/util/parse/mod.ts";
-import { parse as parsePascalString } from "~/parse/PascalString.ts";
-import { parse as parseRect } from "~/parse/Rectangle.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
+import { ParseContext } from "~/util/parse/mod.ts";
 
-
-export function parse(ctx: ParseContext) {
+export function parse(ctx: ParseContext): LayerMask {
     const size = ctx.takeUint32();
-    if (size == 0) {
-        return {};
+    if (size === 0) {
+        return { data: new Uint8Array(0) };
     }
-
-    const enclosingRectangle = parseRect(ctx);
-
+    console.warn("Layer mask is partially supported.");
+    const data = ctx.takeUint8Array(size);
+    return {
+        data
+    };
 }
 
-function parseDefaultColor(ctx: ParseContext) {
-    const color = ctx.peekUint8();
-    switch (color) { }
-}
-
-export type LayerMask = {};
-export type LayerMaskDefaultColor = 0 | 255;
-
-
-export class InvalidLayerMaskDefaultColor extends SyntaxError {
-
-}
+// TODO: parse layer mask
+export type LayerMask = {
+    data: Uint8Array;
+};

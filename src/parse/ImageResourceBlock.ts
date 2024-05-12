@@ -42,7 +42,7 @@ function parseImageResourceId(ctx: ParseContext) {
 
 export type ImageResourceBlock = {
     imageResourceId: number,
-    name: string,
+    name: Uint8Array,
     resourceData: Uint8Array;
 };
 

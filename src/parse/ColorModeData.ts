@@ -1,10 +1,10 @@
-import { ColorMode, FileHeader } from "~/parse/FileHeader.ts";
+import { ColorMode } from "~/parse/FileHeader.ts";
 import { ParseContext } from "~/util/parse/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 
-export function parse(ctx: ParseContext, fileHeader: FileHeader): ColorModeData {
+export function parse(ctx: ParseContext, colorMode: ColorMode): ColorModeData {
     const length = ctx.peekUint32();
-    switch (fileHeader.colorMode) {
+    switch (colorMode) {
         case ColorMode.Bitmap:
         case ColorMode.Grayscale:
         case ColorMode.RGB:

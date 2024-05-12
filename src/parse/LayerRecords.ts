@@ -1,10 +1,12 @@
-import { ParseContext, aligned, measured } from "~/util/parse/mod.ts";
+import { ParseContext, aligned } from "~/util/parse/mod.ts";
+import { SyntaxError } from "~/parse/SyntaxError.ts";
 import { parse as parsePascalString } from "~/parse/PascalString.ts";
-import { FileHeader, Version } from "~/parse/FileHeader.ts";
+import { Version } from "~/parse/FileHeader.ts";
 import { parse as parseBlendMode } from "~/parse/BlendMode.gen.ts";
 import { parse as parseRect, Rectangle } from "~/parse/Rectangle.ts";
-import { parse as parseLayerMask } from "~/parse/LayerMask.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
+import { LayerMask, parse as parseLayerMask } from "~/parse/LayerMask.ts";
+import { LayerBlendingRanges, parse as parseLayerBlendingRange } from "~/parse/LayerBlendingRanges.ts";
+import { BlendMode } from "~/parse/BlendMode.src.ts";
 
 export function parse(ctx: ParseContext, version: Version): LayerRecords {
     const enclosingRectangle = parseRect(ctx);
@@ -20,14 +22,24 @@ export function parse(ctx: ParseContext, version: Version): LayerRecords {
     const layerFlags = parseLayerFlags(ctx);
     void parseFiller(ctx);
     const extraFieldLength = ctx.takeUint32();
+    const extraFieldStart = ctx.byteOffset;
+    const layerMask = parseLayerMask(ctx);
+    const blendingRanges = parseLayerBlendingRange(ctx);
+    const layerName = aligned(parsePascalString, 4)(ctx);
+    const extraFieldEnd = ctx.byteOffset;
+    console.log(layerName);
+    console.log(extraFieldLength);
+    console.log(extraFieldEnd - extraFieldStart);
+    if (extraFieldLength !== extraFieldEnd - extraFieldStart) {
+        throw new ExtraDataFieldOverflowError(extraFieldStart);
+    }
 
-
-    throw new Error("TODO");
+    return { enclosingRectangle, channelCount, blendMode, opacity, clippingMode, layerFlags, layerMask, blendingRanges, layerName };
 }
 
 
 function parseChannelInfo(ctx: ParseContext, version: Version): ChannelInfo {
-    const id = ctx.peekUint16();
+    const id = ctx.peekInt16();
     if (id < 0) {
         if (~id >= 3) {
             throw new InvalidChannelIdError(ctx.byteOffset);
@@ -37,7 +49,8 @@ function parseChannelInfo(ctx: ParseContext, version: Version): ChannelInfo {
             throw new InvalidChannelIdError(ctx.byteOffset);
         }
     }
-    ctx.takeUint16();
+
+    ctx.takeInt16();
 
     const dataLength = (() => {
         switch (version) {
@@ -83,14 +96,9 @@ function parseClippingMode(ctx: ParseContext) {
     return mode as ClippingMode;
 }
 
-function parseLayerFlags(ctx: ParseContext) {
-    const flags = ctx.peekUint8();
-    // bit-0 to bit-4 flags. 
-    // max value = 2^0 + 2^1 + 2^2 + 2^3 + 2^4 = 2^5 - 1
-    if (flags >= (1 << 5)) { // flags > 2^5 - 1
-        throw new InvalidLayerFlagsError(ctx.byteOffset);
-    }
-    ctx.takeUint8();
+function parseLayerFlags(ctx: ParseContext): LayerFlags {
+    const flags = ctx.takeUint8();
+    // NO validation. Some valid Photoshop file seems to have extra flags. 
     return flags;
 }
 
@@ -104,6 +112,14 @@ function parseFiller(ctx: ParseContext) {
 
 export type LayerRecords = {
     enclosingRectangle: Rectangle;
+    channelCount: number;
+    blendMode: BlendMode;
+    opacity: number;
+    clippingMode: ClippingMode;
+    layerFlags: LayerFlags;
+    layerMask: LayerMask;
+    blendingRanges: LayerBlendingRanges;
+    layerName: Uint8Array;
 };
 
 export type ChannelInfo = {
@@ -126,20 +142,17 @@ export enum ClippingMode {
 }
 
 export enum LayerFlags {
-    PositionRelativeToLayer = 1 << 0,
-    LayerMaskDisabled = 1 << 1,
-    /** Obsolete */
-    InvertLayerMaskWenBlending = 1 << 2,
-    /** indicates that the user mask actually came from rendering other data */
-    ExternalUserMask = 1 << 3,
-    /**  indicates that the user and/or vector masks have parameters applied to them */
-    MasksHasParameters = 1 << 4,
+    TransparencyProtected = 1 << 0,
+    Visible = 1 << 1,
+    Obsolete = 1 << 2,
+    PhotoshopVersionLater5 = 1 << 3,
+    PixelDataIrrelevant = 1 << 4,
 }
 
 export class InvalidChannelIdError extends SyntaxError {
     constructor(offset: number) {
         super(offset);
-        this.message = "Channel is must be one of 0, 1, 2, -1, -2, -3";
+        this.message = "Channel id is must be one of 0, 1, 2, -1, -2, -3";
     }
 }
 
@@ -157,16 +170,16 @@ export class InvalidClippingModeError extends SyntaxError {
     }
 }
 
-export class InvalidLayerFlagsError extends SyntaxError {
-    constructor(offset: number) {
-        super(offset);
-        this.message = "Layer flags must be in 0 to 31.";
-    }
-}
-
 export class InvalidFillerError extends SyntaxError {
     constructor(offset: number) {
         super(offset);
         this.message = "Filler must be 0.";
+    }
+}
+
+export class ExtraDataFieldOverflowError extends SyntaxError {
+    constructor(offset: number) {
+        super(offset);
+        this.message = "Extra data field overflows.";
     }
 }
