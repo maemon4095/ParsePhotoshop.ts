@@ -15,7 +15,7 @@ export function generateFunction<T>(cases: readonly (readonly [readonly T[], unk
         trees.set(len, generateTree(cases));
     }
 
-    const arrayName = "__array";
+    const arrayName = "_";
     const defaultCaseCode = "return undefined;";
     function genTrie(depth: number, tree: DecisionTree<T>): string {
         return generateSwitch(
