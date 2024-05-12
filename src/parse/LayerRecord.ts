@@ -11,7 +11,13 @@ export function parse(ctx: ParseContext, version: Version): LayerRecord {
         channelInfos[i] = parseChannelInfo(ctx, version);
     }
     void parseBlendModeSigneture(ctx);
-    const mode = parseBlendMode(ctx);
+    const blendMode = parseBlendMode(ctx);
+    const opacity = ctx.takeUint8();
+    const clippingMode = parseClippingMode(ctx);
+    const layerFlags = parseLayerFlags(ctx);
+    void parseFiller(ctx);
+    const extraFieldLength = ctx.takeUint32();
+
 
     throw new Error("TODO");
 }
@@ -71,6 +77,35 @@ function parseBlendModeSigneture(ctx: ParseContext) {
     ctx.takeUint8();
 }
 
+function parseClippingMode(ctx: ParseContext) {
+    const mode = ctx.peekUint8();
+    switch (mode) {
+        case 0: case 1: break;
+        default: throw new InvalidClippingModeError(ctx.byteOffset);
+    }
+    ctx.takeUint8();
+    return mode as ClippingMode;
+}
+
+function parseLayerFlags(ctx: ParseContext) {
+    const flags = ctx.peekUint8();
+    // bit-0 to bit-4 flags. 
+    // max value = 2^0 + 2^1 + 2^2 + 2^3 + 2^4 = 2^5 - 1
+    if (flags >= (1 << 5)) { // flags > 2^5 - 1
+        throw new InvalidLayerFlagsError(ctx.byteOffset);
+    }
+    ctx.takeUint8();
+    return flags;
+}
+
+function parseFiller(ctx: ParseContext) {
+    const filler = ctx.peekUint8();
+    if (filler !== 0) {
+        throw new InvalidFillerError(ctx.byteOffset);
+    }
+    ctx.takeUint8();
+}
+
 export type LayerRecord = {
     containingRectangle: Rectangle;
 };
@@ -96,35 +131,20 @@ export enum ChannelId {
     RealUserLayerMask = -3
 }
 
-export enum BlendModeKey {
-    PassThrough = "pass",
-    Normal = "norm",
-    Dissolve = "diss",
-    Darken = "dark",
-    Multiply = "mul ",
-    ColorBurn = "idiv",
-    LinearBurn = "lbrn",
-    DarkerColor = "dkCl",
-    Lighten = "lite",
-    Screen = "scrn",
-    ColorDodge = "div ",
-    LinearDodge = "lddg",
-    LighterColor = "lgCl",
-    Overlay = "over",
-    SoftLight = "sLit",
-    HardLight = "hLit",
-    VividLight = "vLit",
-    LinearLight = "lLit",
-    PinLight = "pLit",
-    HardMix = "hMix",
-    Difference = "diff",
-    Exclusion = "smud",
-    Subtract = "fsub",
-    Divide = "fdiv",
-    Hue = "hue ",
-    Saturation = "sat ",
-    Color = "colr",
-    Luminosity = "lum "
+export enum ClippingMode {
+    Base = 0,
+    NonBase = 1
+}
+
+export enum LayerFlags {
+    PositionRelativeToLayer = 1 << 0,
+    LayerMaskDisabled = 1 << 1,
+    /** Obsolete */
+    InvertLayerMaskWenBlending = 1 << 2,
+    /** indicates that the user mask actually came from rendering other data */
+    ExternalUserMask = 1 << 3,
+    /**  indicates that the user and/or vector masks have parameters applied to them */
+    MasksHasParameters = 1 << 4,
 }
 
 export class InvalidChannelIdError extends Error {
@@ -142,5 +162,32 @@ export class InvalidBlendModeSignetureError extends Error {
         super();
         this.offset = offset;
         this.message = "Blend mode signeture must be `8BIM`";
+    }
+}
+
+export class InvalidClippingModeError extends Error {
+    readonly offset: number;
+    constructor(offset: number) {
+        super();
+        this.offset = offset;
+        this.message = "Clipping mode must be 0(base) or 1(non-base).";
+    }
+}
+
+export class InvalidLayerFlagsError extends Error {
+    readonly offset: number;
+    constructor(offset: number) {
+        super();
+        this.offset = offset;
+        this.message = "Layer flags must be in 0 to 31.";
+    }
+}
+
+export class InvalidFillerError extends Error {
+    readonly offset: number;
+    constructor(offset: number) {
+        super();
+        this.offset = offset;
+        this.message = "Filler must be 0.";
     }
 }

@@ -10,11 +10,14 @@ export function parse(ctx: ParseContext): ImageResources {
         blocks.push(block);
         rest -= consumed;
     }
+    if (rest !== 0) {
+        throw new InvalidImageResourceBlockOverflowError(ctx.byteOffset);
+    }
 
     return { blocks };
 }
 
-/** The third section of PSD/PSB */
+/** The third section of Photoshop file */
 export type ImageResources = {
     blocks: ImageResourceBlock[];
 };

@@ -10,44 +10,43 @@ export function parse(ctx: ParseContext) {
     ctx.advance(4);
     return mode;
 }
-
 class Trie {
     @_trie({
-        "pass": BlendModeKey.PassThrough,
-        "norm": BlendModeKey.Normal,
-        "diss": BlendModeKey.Dissolve,
-        "dark": BlendModeKey.Darken,
-        "mul ": BlendModeKey.Multiply,
-        "idiv": BlendModeKey.ColorBurn,
-        "lbrn": BlendModeKey.LinearBurn,
-        "dkCl": BlendModeKey.DarkerColor,
-        "lite": BlendModeKey.Lighten,
-        "scrn": BlendModeKey.Screen,
-        "div ": BlendModeKey.ColorDodge,
-        "lddg": BlendModeKey.LinearDodge,
-        "lgCl": BlendModeKey.LighterColor,
-        "over": BlendModeKey.Overlay,
-        "sLit": BlendModeKey.SoftLight,
-        "hLit": BlendModeKey.HardLight,
-        "vLit": BlendModeKey.VividLight,
-        "lLit": BlendModeKey.LinearLight,
-        "pLit": BlendModeKey.PinLight,
-        "hMix": BlendModeKey.HardMix,
-        "diff": BlendModeKey.Difference,
-        "smud": BlendModeKey.Exclusion,
-        "fsub": BlendModeKey.Subtract,
-        "fdiv": BlendModeKey.Divide,
-        "hue ": BlendModeKey.Hue,
-        "sat ": BlendModeKey.Saturation,
-        "colr": BlendModeKey.Color,
-        "lum ": BlendModeKey.Luminosity
+        "pass": BlendMode.PassThrough,
+        "norm": BlendMode.Normal,
+        "diss": BlendMode.Dissolve,
+        "dark": BlendMode.Darken,
+        "mul ": BlendMode.Multiply,
+        "idiv": BlendMode.ColorBurn,
+        "lbrn": BlendMode.LinearBurn,
+        "dkCl": BlendMode.DarkerColor,
+        "lite": BlendMode.Lighten,
+        "scrn": BlendMode.Screen,
+        "div ": BlendMode.ColorDodge,
+        "lddg": BlendMode.LinearDodge,
+        "lgCl": BlendMode.LighterColor,
+        "over": BlendMode.Overlay,
+        "sLit": BlendMode.SoftLight,
+        "hLit": BlendMode.HardLight,
+        "vLit": BlendMode.VividLight,
+        "lLit": BlendMode.LinearLight,
+        "pLit": BlendMode.PinLight,
+        "hMix": BlendMode.HardMix,
+        "diff": BlendMode.Difference,
+        "smud": BlendMode.Exclusion,
+        "fsub": BlendMode.Subtract,
+        "fdiv": BlendMode.Divide,
+        "hue ": BlendMode.Hue,
+        "sat ": BlendMode.Saturation,
+        "colr": BlendMode.Color,
+        "lum ": BlendMode.Luminosity
     })
-    static determine(_seq: Uint8Array): undefined | BlendModeKey {
+    static determine(_seq: Uint8Array): undefined | BlendMode {
         throw new Error("not generated.");
     }
 }
 
-export enum BlendModeKey {
+export enum BlendMode {
     PassThrough,
     Normal,
     Dissolve,

@@ -1,3 +1,6 @@
 {
     "deno.enable": true,
+    "files.readonlyInclude": {
+        "**/*.gen.ts": true
+    }
 }

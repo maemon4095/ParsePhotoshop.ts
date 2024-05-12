@@ -28,7 +28,7 @@ export function parse(ctx: ParseContext, fileHeader: FileHeader): ColorModeData 
     return { data };
 }
 
-/** The second section of PSD/PSB */
+/** The second section of Photoshop file */
 export type ColorModeData = {
     data: Uint8Array;
 };

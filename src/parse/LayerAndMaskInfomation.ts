@@ -14,3 +14,8 @@ export function parse(ctx: ParseContext, version: Version) {
 
     const layerInfo = parseLayerInfo(ctx, version);
 }
+
+/** The fourth section of a Photoshop file */
+type LayerAndMaskInformation = {
+
+};

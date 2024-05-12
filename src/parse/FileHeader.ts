@@ -7,10 +7,10 @@ export function parse(ctx: ParseContext): FileHeader {
     const channelCount = parseChannelCount(ctx);
     const height = parseImageHeight(ctx, version);
     const width = parseImageWidth(ctx, version);
-    const depth = parseDepth(ctx);
+    const colorDepth = parseColorDepth(ctx);
     const colorMode = parseColorMode(ctx);
 
-    return { version, channelCount, height, width, depth, colorMode };
+    return { version, channelCount, height, width, colorDepth, colorMode };
 }
 
 function parseSigneture(ctx: ParseContext) {
@@ -107,7 +107,7 @@ function parseImageWidth(ctx: ParseContext, version: Version) {
     return width;
 }
 
-function parseDepth(ctx: ParseContext): Depth {
+function parseColorDepth(ctx: ParseContext): ColorDepth {
     const depth = ctx.peekUint16();
     switch (depth) {
         case 1:
@@ -140,7 +140,7 @@ function parseColorMode(ctx: ParseContext): ColorMode {
     return mode;
 }
 
-/** The first section of PSD/PSB. */
+/** The first section of Photoshop file */
 export type FileHeader = {
     version: Version;
     /** Channel count in the image, including any alpha channels. Supported range is 1 to 56. */
@@ -149,7 +149,7 @@ export type FileHeader = {
     height: number;
     /** Width of the image in pixels. PSD: 1 to 30,000, PSB: 1 to 300,000. */
     width: number;
-    depth: Depth;
+    colorDepth: ColorDepth;
     colorMode: ColorMode;
 };
 
@@ -159,7 +159,7 @@ export enum Version {
 }
 
 /** bits per channel */
-export type Depth = 1 | 8 | 16 | 32;
+export type ColorDepth = 1 | 8 | 16 | 32;
 
 export enum ColorMode {
     Bitmap = 0,
