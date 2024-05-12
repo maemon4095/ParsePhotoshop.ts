@@ -17,6 +17,7 @@ export function parse(ctx: ParseContext, version: Version): LayerAndMaskInformat
     throw new Error("TODO");
 }
 
+
 /** The fourth section of a Photoshop file */
 export type LayerAndMaskInformation = {
     layerInfo: LayerInfo;

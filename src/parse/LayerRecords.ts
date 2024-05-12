@@ -6,7 +6,8 @@ import { parse as parseBlendMode } from "~/parse/BlendMode.gen.ts";
 import { parse as parseRect, Rectangle } from "~/parse/Rectangle.ts";
 import { LayerMask, parse as parseLayerMask } from "~/parse/LayerMask.ts";
 import { LayerBlendingRanges, parse as parseLayerBlendingRange } from "~/parse/LayerBlendingRanges.ts";
-import { BlendMode } from "~/parse/BlendMode.src.ts";
+import { SupportedBlendMode } from "~/parse/BlendMode.gen.ts";
+import { AdditionalLayerInformation, parse as parseAdditionalLayerInformation } from "~/parse/AdditionalLayerInformation.gen.ts";
 
 export function parse(ctx: ParseContext, version: Version): LayerRecords {
     const enclosingRectangle = parseRect(ctx);
@@ -16,7 +17,7 @@ export function parse(ctx: ParseContext, version: Version): LayerRecords {
         channelInfos[i] = parseChannelInfo(ctx, version);
     }
     void parseBlendModeSigneture(ctx);
-    const blendMode = parseBlendMode(ctx);
+    const [blendMode, rawBlendMode] = parseBlendMode(ctx);
     const opacity = ctx.takeUint8();
     const clippingMode = parseClippingMode(ctx);
     const layerFlags = parseLayerFlags(ctx);
@@ -26,15 +27,32 @@ export function parse(ctx: ParseContext, version: Version): LayerRecords {
     const layerMask = parseLayerMask(ctx);
     const blendingRanges = parseLayerBlendingRange(ctx);
     const layerName = aligned(parsePascalString, 4)(ctx);
-    const extraFieldEnd = ctx.byteOffset;
-    console.log(layerName);
-    console.log(extraFieldLength);
-    console.log(extraFieldEnd - extraFieldStart);
-    if (extraFieldLength !== extraFieldEnd - extraFieldStart) {
+    const additionalLayerInformations: AdditionalLayerInformation[] = [];
+    let extraSpaceLeft = extraFieldLength - (ctx.byteOffset - extraFieldStart);
+    while (extraSpaceLeft > 0) {
+        const start = ctx.byteOffset;
+        const info = parseAdditionalLayerInformation(ctx, version);
+        const consumed = ctx.byteOffset - start;
+        additionalLayerInformations.push(info);
+        extraSpaceLeft -= consumed;
+    }
+    if (extraSpaceLeft !== 0) {
         throw new ExtraDataFieldOverflowError(extraFieldStart);
     }
 
-    return { enclosingRectangle, channelCount, blendMode, opacity, clippingMode, layerFlags, layerMask, blendingRanges, layerName };
+    return {
+        enclosingRectangle,
+        channelCount,
+        blendMode,
+        rawBlendMode,
+        opacity,
+        clippingMode,
+        layerFlags,
+        layerMask,
+        blendingRanges,
+        layerName,
+        additionalLayerInformations
+    };
 }
 
 
@@ -113,13 +131,15 @@ function parseFiller(ctx: ParseContext) {
 export type LayerRecords = {
     enclosingRectangle: Rectangle;
     channelCount: number;
-    blendMode: BlendMode;
+    blendMode: SupportedBlendMode;
+    rawBlendMode: Uint8Array;
     opacity: number;
     clippingMode: ClippingMode;
     layerFlags: LayerFlags;
     layerMask: LayerMask;
     blendingRanges: LayerBlendingRanges;
     layerName: Uint8Array;
+    additionalLayerInformations: AdditionalLayerInformation[];
 };
 
 export type ChannelInfo = {

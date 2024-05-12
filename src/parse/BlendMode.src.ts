@@ -2,52 +2,52 @@ import { ParseContext } from "~/util/parse/mod.ts";
 import { _trie } from "$/tools/GenerateTrie/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 
-export function parse(ctx: ParseContext) {
-    const bin = ctx.peekUint8Array(4);
+export function parse(ctx: ParseContext): [SupportedBlendMode, Uint8Array] {
+    const bin = ctx.takeUint8Array(4);
     const mode = Trie.determine(bin);
     if (mode === undefined) {
-        throw new InvalidBlendModeError(ctx.byteOffset);
+        console.warn("Unsupported blend mode was detected.");
     }
-    ctx.advance(4);
-    return mode;
+    return [mode ?? SupportedBlendMode.Unsupported, bin];
 }
 class Trie {
     @_trie({
-        "pass": BlendMode.PassThrough,
-        "norm": BlendMode.Normal,
-        "diss": BlendMode.Dissolve,
-        "dark": BlendMode.Darken,
-        "mul ": BlendMode.Multiply,
-        "idiv": BlendMode.ColorBurn,
-        "lbrn": BlendMode.LinearBurn,
-        "dkCl": BlendMode.DarkerColor,
-        "lite": BlendMode.Lighten,
-        "scrn": BlendMode.Screen,
-        "div ": BlendMode.ColorDodge,
-        "lddg": BlendMode.LinearDodge,
-        "lgCl": BlendMode.LighterColor,
-        "over": BlendMode.Overlay,
-        "sLit": BlendMode.SoftLight,
-        "hLit": BlendMode.HardLight,
-        "vLit": BlendMode.VividLight,
-        "lLit": BlendMode.LinearLight,
-        "pLit": BlendMode.PinLight,
-        "hMix": BlendMode.HardMix,
-        "diff": BlendMode.Difference,
-        "smud": BlendMode.Exclusion,
-        "fsub": BlendMode.Subtract,
-        "fdiv": BlendMode.Divide,
-        "hue ": BlendMode.Hue,
-        "sat ": BlendMode.Saturation,
-        "colr": BlendMode.Color,
-        "lum ": BlendMode.Luminosity
+        "pass": SupportedBlendMode.PassThrough,
+        "norm": SupportedBlendMode.Normal,
+        "diss": SupportedBlendMode.Dissolve,
+        "dark": SupportedBlendMode.Darken,
+        "mul ": SupportedBlendMode.Multiply,
+        "idiv": SupportedBlendMode.ColorBurn,
+        "lbrn": SupportedBlendMode.LinearBurn,
+        "dkCl": SupportedBlendMode.DarkerColor,
+        "lite": SupportedBlendMode.Lighten,
+        "scrn": SupportedBlendMode.Screen,
+        "div ": SupportedBlendMode.ColorDodge,
+        "lddg": SupportedBlendMode.LinearDodge,
+        "lgCl": SupportedBlendMode.LighterColor,
+        "over": SupportedBlendMode.Overlay,
+        "sLit": SupportedBlendMode.SoftLight,
+        "hLit": SupportedBlendMode.HardLight,
+        "vLit": SupportedBlendMode.VividLight,
+        "lLit": SupportedBlendMode.LinearLight,
+        "pLit": SupportedBlendMode.PinLight,
+        "hMix": SupportedBlendMode.HardMix,
+        "diff": SupportedBlendMode.Difference,
+        "smud": SupportedBlendMode.Exclusion,
+        "fsub": SupportedBlendMode.Subtract,
+        "fdiv": SupportedBlendMode.Divide,
+        "hue ": SupportedBlendMode.Hue,
+        "sat ": SupportedBlendMode.Saturation,
+        "colr": SupportedBlendMode.Color,
+        "lum ": SupportedBlendMode.Luminosity
     })
-    static determine(_seq: Uint8Array): undefined | BlendMode {
+    static determine(_seq: Uint8Array): undefined | SupportedBlendMode {
         throw new Error("not generated.");
     }
 }
 
-export enum BlendMode {
+export enum SupportedBlendMode {
+    Unsupported,
     PassThrough,
     Normal,
     Dissolve,

@@ -39,29 +39,25 @@ const successfulCases = Object.entries(table).map(([key, value]) => {
 });
 
 Deno.test("parse BlendMode", () => {
-    for (const [input, result] of successfulCases) {
+    for (const [input, expected] of successfulCases) {
         const context = ParseContext.create(input.buffer);
-        assertEquals(parse(context), result);
+        const [result] = parse(context);
+        assertEquals(result, expected);
     }
 
     const randomCaseCount = 1000;
     for (let i = 0; i < randomCaseCount; ++i) {
-        const buf = new Uint8Array(Math.floor(Math.random() * 10));
+        const buf = new Uint8Array(4);
         crypto.getRandomValues(buf);
         const expected = (() => {
             for (const [c, v] of successfulCases) {
                 if (arrayEq(c, buf)) return v;
             }
+            return BlendMode.Unknown;
         })();
 
         const context = ParseContext.create(buf.buffer);
-        const result = (() => {
-            try {
-                return parse(context);
-            } catch {
-                return undefined;
-            };
-        })();
+        const [result] = parse(context);
 
         assertEquals(result, expected);
     }
