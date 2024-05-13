@@ -1,1 +1,3 @@
-export { parse } from "~/parse/mod.ts";
+import parse from "~/parse/mod.ts";
+
+export { parse };

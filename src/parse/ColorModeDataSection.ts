@@ -2,7 +2,7 @@ import { ColorMode } from "~/parse/FileHeaderSection.ts";
 import { ParseContext } from "~/util/parse/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 
-export default function parse(ctx: ParseContext, colorMode: ColorMode): ColorModeData {
+export default function parse(ctx: ParseContext, colorMode: ColorMode): ColorModeDataSection {
     const length = ctx.peekUint32();
     switch (colorMode) {
         case ColorMode.Bitmap:
@@ -30,7 +30,7 @@ export default function parse(ctx: ParseContext, colorMode: ColorMode): ColorMod
 }
 
 /** The second section of Photoshop file */
-export type ColorModeData = {
+export type ColorModeDataSection = {
     data: Uint8Array;
 };
 
