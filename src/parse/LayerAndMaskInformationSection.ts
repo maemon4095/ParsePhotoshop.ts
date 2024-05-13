@@ -2,7 +2,7 @@ import { ParseContext } from "~/util/parse/mod.ts";
 import { ColorDepth, Version } from "~/parse/FileHeaderSection.ts";
 import parseLayerInfo, { LayerInfo } from "~/parse/LayerInfo.ts";
 import parseGlobalLayerMaskInfo, { GlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
-import parseAdditionalLayerInfo, { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation/mod.gen.ts";
+import parseAdditionalLayerInfo, { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation/mod.ts";
 
 export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerAndMaskInformationSection {
     const sectionLength = (() => {

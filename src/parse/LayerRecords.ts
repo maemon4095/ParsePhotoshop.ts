@@ -7,7 +7,7 @@ import parseRect, { Rectangle } from "~/parse/Rectangle.ts";
 import parseLayerMask, { LayerMask } from "~/parse/LayerMask.ts";
 import parseLayerBlendingRange, { LayerBlendingRanges } from "~/parse/LayerBlendingRanges.ts";
 import { SupportedBlendMode } from "~/parse/BlendMode.gen.ts";
-import parseAdditionalLayerInformation, { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation.gen.ts";
+import parseAdditionalLayerInformation, { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation/mod.ts";
 
 export default function parse(ctx: ParseContext, version: Version): LayerRecords {
     const enclosingRectangle = parseRect(ctx);
