@@ -5,6 +5,7 @@ import { parse as parseFileHeader } from "~/parse/FileHeader.ts";
 import { parse as parseColorModeData } from "~/parse/ColorModeData.ts";
 import { parse as parseImageResources } from "~/parse/ImageResources.ts";
 import { parse as parseLayerAndMaskInformation } from "~/parse/LayerAndMaskInformation.ts";
+import parseImageDataSection from "~/parse/ImageDataSection.ts";
 
 // 全データはbig-endianで保存される.
 export function parse(buffer: ArrayBuffer) {
@@ -17,4 +18,5 @@ export function parse(buffer: ArrayBuffer) {
     console.log("imageResources:", imageResources);
     const layerAndMaskInformation = parseLayerAndMaskInformation(ctx, fileHeader.colorDepth, fileHeader.version);
     console.log("layerAndMaskInformation:", layerAndMaskInformation);
+    parseImageDataSection(ctx, fileHeader);
 }

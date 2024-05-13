@@ -14,9 +14,14 @@ export class ParseContext {
         this.#view = view;
     }
 
-    get byteOffset() {
+    get byteOffset(): number {
         return this.#byteOffset;
     }
+
+    get bytesLeft(): number {
+        return this.#view.byteLength - this.#byteOffset;
+    }
+
 
     seekTo(byteOffset: number) {
         this.#byteOffset = byteOffset;
@@ -35,12 +40,16 @@ export class ParseContext {
         }
     }
 
-    peekUint8Array(length: number): Uint8Array {
-        const buf = new Uint8Array(length);
+    peekUint8Into(buf: Uint8Array) {
         const offset = this.#byteOffset;
-        for (let i = 0; i < length; ++i) {
+        for (let i = 0; i < buf.length; ++i) {
             buf[i] = this.#view.getUint8(offset + i);
         }
+    }
+
+    peekUint8Array(length: number): Uint8Array {
+        const buf = new Uint8Array(length);
+        this.peekUint8Into(buf);
         return buf;
     }
 
@@ -88,6 +97,11 @@ export class ParseContext {
         const buf = this.peekUint8Array(length);
         this.#byteOffset += length;
         return buf;
+    }
+
+    takeUint8Into(buf: Uint8Array) {
+        this.peekUint8Into(buf);
+        this.#byteOffset += buf.length;
     }
 
     takeUint8(): number {

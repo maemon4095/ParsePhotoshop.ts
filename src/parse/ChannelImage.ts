@@ -1,27 +1,18 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 import { Version } from "~/parse/FileHeader.ts";
 import { LayerRecords } from "~/parse/LayerRecords.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
 import { ColorDepth } from "~/parse/FileHeader.ts";
+import parseImageDataCompression, { ImageDataCompression } from "~/parse/ImageCompression.ts";
 
 export function parse(ctx: ParseContext, depth: ColorDepth, version: Version, layerRecords: LayerRecords): ChannelImage {
-    const compression = parseChannelImageCompression(ctx);
+    const compression = parseImageDataCompression(ctx);
     switch (compression) {
-        case ChannelImageCompression.Raw: return parseImageRaw(ctx, depth, layerRecords);
-        case ChannelImageCompression.RLE: return parseImageRLE(ctx, version, layerRecords);
-        case ChannelImageCompression.ZIP:
-        case ChannelImageCompression.ZIP_Prediction:
+        case ImageDataCompression.Raw: return parseImageRaw(ctx, depth, layerRecords);
+        case ImageDataCompression.RLE: return parseImageRLE(ctx, version, layerRecords);
+        case ImageDataCompression.ZIP:
+        case ImageDataCompression.ZIP_Prediction:
             throw new Error("TODO");
     }
-}
-
-function parseChannelImageCompression(ctx: ParseContext): ChannelImageCompression {
-    const compression = ctx.peekUint16();
-    if (compression >= 4) {
-        throw new InvalidChannelImageDataCompressionError(ctx.byteOffset);
-    }
-    ctx.takeUint16();
-    return compression;
 }
 
 function parseImageRaw(ctx: ParseContext, depth: ColorDepth, layerRecords: LayerRecords): ChannelImageRaw {
@@ -34,7 +25,7 @@ function parseImageRaw(ctx: ParseContext, depth: ColorDepth, layerRecords: Layer
         return imageSize * Math.floor(depth / 8);
     })();
     const data = ctx.takeUint8Array(dataLength);
-    return { compression: ChannelImageCompression.Raw, data };
+    return { compression: ImageDataCompression.Raw, data };
 }
 function parseImageRLE(ctx: ParseContext, version: Version, layerRecords: LayerRecords): ChannelImageRLE {
     const imageRect = layerRecords.enclosingRectangle;
@@ -58,40 +49,24 @@ function parseImageRLE(ctx: ParseContext, version: Version, layerRecords: LayerR
         scanLines[i] = scanline;
     }
 
-    return { compression: ChannelImageCompression.RLE, scanLines };
+    return { compression: ImageDataCompression.RLE, scanLines };
 }
 
 type ChannelImageMap = {
-    [ChannelImageCompression.RLE]: ChannelImageRLE;
-    [ChannelImageCompression.Raw]: ChannelImageRaw;
-    [ChannelImageCompression.ZIP]: never;
-    [ChannelImageCompression.ZIP_Prediction]: never;
+    [ImageDataCompression.RLE]: ChannelImageRLE;
+    [ImageDataCompression.Raw]: ChannelImageRaw;
+    [ImageDataCompression.ZIP]: never;
+    [ImageDataCompression.ZIP_Prediction]: never;
 };
 
 export type ChannelImageRaw = {
-    compression: ChannelImageCompression.Raw;
+    compression: ImageDataCompression.Raw;
     data: Uint8Array;
 };
 
 export type ChannelImageRLE = {
-    compression: ChannelImageCompression.RLE;
+    compression: ImageDataCompression.RLE;
     scanLines: Uint8Array[];
 };
 
-export type ChannelImage = ChannelImageMap[ChannelImageCompression];
-
-export enum ChannelImageCompression {
-    Raw = 0,
-    RLE = 1,
-    ZIP = 2,
-    ZIP_Prediction = 3
-}
-
-export class InvalidChannelImageDataCompressionError extends SyntaxError {
-    constructor(byteOffset: number) {
-        super(byteOffset);
-        this.message = "Channel image data compression must be 0 = raw data, 1 = RLE, 2 = ZIP, 3 = ZIP with prediction.";
-    }
-}
-
-
+export type ChannelImage = ChannelImageMap[ImageDataCompression];
