@@ -7,15 +7,15 @@ export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version
     const sectionLength = (() => {
         switch (version) {
             case Version.PSD:
-                return BigInt(ctx.takeUint32());
+                return ctx.takeUint32();
             case Version.PSB:
-                return ctx.takeUint64();
+                return Number(ctx.takeUint64());
         }
     })();
-    if (sectionLength === 0n) {
+    if (sectionLength === 0) {
         return null;
     }
-
+    const sectionStart = ctx.byteOffset;
     const [layerCount, isFirstLayerContainsTransparencyData] = (() => {
         const layerCount = ctx.takeInt16();
         if (layerCount < 0) {
@@ -40,9 +40,12 @@ export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version
             imageDataArray[j] = data;
         }
     }
+    const sectionEnd = ctx.byteOffset;
+    const sectionConsumed = sectionEnd - sectionStart;
+    const paddingSize = sectionLength - sectionConsumed;
+    ctx.advance(paddingSize);
 
     return {
-        sectionLength,
         isFirstLayerContainsTransparencyData,
         layerCount,
         layerRecords,
@@ -51,7 +54,6 @@ export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version
 }
 
 export type LayerInfo = {
-    sectionLength: bigint,
     isFirstLayerContainsTransparencyData: boolean,
     layerCount: number,
     layerRecords: LayerRecords[];
