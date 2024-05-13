@@ -1,3 +1,4 @@
 /deno.lock
-/.vscode/launch.json
 /dist
+/tests/index.test.ts
+/.vscode/launch.json
