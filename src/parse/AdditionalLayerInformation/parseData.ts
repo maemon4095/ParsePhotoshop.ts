@@ -3,7 +3,7 @@ import { Version } from "~/parse/FileHeaderSection.ts";
 import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 import parseUnicodeLayerName, { UnicodeLayerName } from "~/parse/AdditionalLayerInformation/UnicodeLayerName.ts";
 import parseUnsupportedData, { UnsupportedData } from "~/parse/AdditionalLayerInformation/Unsupported.ts";
-import parseLayerId, { LayerId } from "~/parse/AdditionalLayerInformation/LayerID.ts";
+import parseLayerId, { LayerId } from "~/parse/AdditionalLayerInformation/LayerId.ts";
 
 export default function parse(ctx: ParseContext, dataSize: number, key: SuportedAdjustmentLayerKey, _version: Version) {
     switch (key) {
