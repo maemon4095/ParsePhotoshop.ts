@@ -1,15 +1,15 @@
 import { ParseContext, aligned } from "~/util/parse/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
-import { parse as parsePascalString } from "~/parse/PascalString.ts";
-import { Version } from "~/parse/FileHeader.ts";
-import { parse as parseBlendMode } from "~/parse/BlendMode.gen.ts";
-import { parse as parseRect, Rectangle } from "~/parse/Rectangle.ts";
-import { LayerMask, parse as parseLayerMask } from "~/parse/LayerMask.ts";
-import { LayerBlendingRanges, parse as parseLayerBlendingRange } from "~/parse/LayerBlendingRanges.ts";
+import parsePascalString from "~/parse/PascalString.ts";
+import { Version } from "~/parse/FileHeaderSection.ts";
+import parseBlendMode from "~/parse/BlendMode.gen.ts";
+import parseRect, { Rectangle } from "~/parse/Rectangle.ts";
+import parseLayerMask, { LayerMask } from "~/parse/LayerMask.ts";
+import parseLayerBlendingRange, { LayerBlendingRanges } from "~/parse/LayerBlendingRanges.ts";
 import { SupportedBlendMode } from "~/parse/BlendMode.gen.ts";
-import { AdditionalLayerInformation, parse as parseAdditionalLayerInformation } from "~/parse/AdditionalLayerInformation.gen.ts";
+import parseAdditionalLayerInformation, { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation.gen.ts";
 
-export function parse(ctx: ParseContext, version: Version): LayerRecords {
+export default function parse(ctx: ParseContext, version: Version): LayerRecords {
     const enclosingRectangle = parseRect(ctx);
     const channelCount = ctx.takeUint16();
     const channelInfos: ChannelInfo[] = new Array(channelCount);

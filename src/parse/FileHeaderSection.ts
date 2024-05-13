@@ -1,7 +1,7 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 
-export function parse(ctx: ParseContext): FileHeader {
+export default function parse(ctx: ParseContext): FileHeaderSection {
     void parseSigneture(ctx);
     const version = parseVersion(ctx);
     void parseReserved(ctx);
@@ -142,7 +142,7 @@ function parseColorMode(ctx: ParseContext): ColorMode {
 }
 
 /** The first section of Photoshop file */
-export type FileHeader = {
+export type FileHeaderSection = {
     version: Version;
     /** Channel count in the image, including any alpha channels. Supported range is 1 to 56. */
     channelCount: number;

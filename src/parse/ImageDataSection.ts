@@ -1,7 +1,7 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 import parseImageDataCompression, { ImageDataCompression } from "~/parse/ImageCompression.ts";
-import { FileHeader } from "~/parse/FileHeader.ts";
-export default function parse(ctx: ParseContext, fileHeader: FileHeader) {
+import { FileHeaderSection } from "~/parse/FileHeaderSection.ts";
+export default function parse(ctx: ParseContext, fileHeader: FileHeaderSection) {
     const compression = parseImageDataCompression(ctx);
     switch (compression) {
         case ImageDataCompression.Raw:

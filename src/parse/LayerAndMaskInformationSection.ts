@@ -1,9 +1,9 @@
 import { ParseContext } from "~/util/parse/mod.ts";
-import { ColorDepth, Version } from "~/parse/FileHeader.ts";
-import { LayerInfo, parse as parseLayerInfo } from "~/parse/LayerInfo.ts";
-import { GlobalLayerMaskInfo, parse as parseGlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
+import { ColorDepth, Version } from "~/parse/FileHeaderSection.ts";
+import parseLayerInfo, { LayerInfo } from "~/parse/LayerInfo.ts";
+import parseGlobalLayerMaskInfo, { GlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
 
-export function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerAndMaskInformation | null {
+export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerAndMaskInformationSection | null {
     const sectionLength = (() => {
         switch (version) {
             case Version.PSD:
@@ -23,7 +23,7 @@ export function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Versio
 
 
 /** The fourth section of a Photoshop file */
-export type LayerAndMaskInformation = {
+export type LayerAndMaskInformationSection = {
     layerInfo: LayerInfo | null;
     globalLayerMaskInfo: GlobalLayerMaskInfo | null;
 };

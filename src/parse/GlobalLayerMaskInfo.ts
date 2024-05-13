@@ -1,6 +1,6 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 
-export function parse(ctx: ParseContext): GlobalLayerMaskInfo | null {
+export default function parse(ctx: ParseContext): GlobalLayerMaskInfo | null {
     const length = ctx.takeUint32();
     if (length === 0) {
         return null;

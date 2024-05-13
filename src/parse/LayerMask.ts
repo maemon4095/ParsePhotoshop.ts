@@ -1,6 +1,6 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 
-export function parse(ctx: ParseContext): LayerMask {
+export default function parse(ctx: ParseContext): LayerMask {
     const size = ctx.takeUint32();
     if (size === 0) {
         return { data: new Uint8Array(0) };

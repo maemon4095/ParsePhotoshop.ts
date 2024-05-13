@@ -1,8 +1,8 @@
 import { ParseContext, measured } from "~/util/parse/mod.ts";
-import { parse as parseBlock, ImageResourceBlock } from "~/parse/ImageResourceBlock.ts";
+import parseBlock, { ImageResourceBlock } from "~/parse/ImageResourceBlock.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 
-export function parse(ctx: ParseContext): ImageResources {
+export default function parse(ctx: ParseContext): ImageResourcesSection {
     let rest = ctx.takeUint32();
     const blocks: ImageResourceBlock[] = [];
     const measuredParseBlock = measured(parseBlock);
@@ -19,7 +19,7 @@ export function parse(ctx: ParseContext): ImageResources {
 }
 
 /** The third section of Photoshop file */
-export type ImageResources = {
+export type ImageResourcesSection = {
     blocks: ImageResourceBlock[];
 };
 

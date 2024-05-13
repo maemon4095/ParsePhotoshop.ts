@@ -1,10 +1,9 @@
 import { ParseContext } from "~/util/parse/mod.ts";
-import { Version } from "~/parse/FileHeader.ts";
+import { Version, ColorDepth } from "~/parse/FileHeaderSection.ts";
 import { LayerRecords } from "~/parse/LayerRecords.ts";
-import { ColorDepth } from "~/parse/FileHeader.ts";
 import parseImageDataCompression, { ImageDataCompression } from "~/parse/ImageCompression.ts";
 
-export function parse(ctx: ParseContext, depth: ColorDepth, version: Version, layerRecords: LayerRecords): ChannelImage {
+export default function parse(ctx: ParseContext, depth: ColorDepth, version: Version, layerRecords: LayerRecords): ChannelImage {
     const compression = parseImageDataCompression(ctx);
     switch (compression) {
         case ImageDataCompression.Raw: return parseImageRaw(ctx, depth, layerRecords);

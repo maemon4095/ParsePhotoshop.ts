@@ -1,4 +1,4 @@
-import { SupportedBlendMode, parse } from "~/parse/BlendMode.gen.ts";
+import parse, { SupportedBlendMode } from "~/parse/BlendMode.gen.ts";
 import { ParseContext } from "~/util/parse/mod.ts";
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
 

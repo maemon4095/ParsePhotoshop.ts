@@ -1,10 +1,10 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 import { _trie } from "$/tools/GenerateTrie/mod.ts";
-import { Version } from "~/parse/FileHeader.ts";
-import { parse as parseUnicodeString } from "~/parse/UnicodeString.ts";
+import { Version } from "~/parse/FileHeaderSection.ts";
+import parseUnicodeString from "~/parse/UnicodeString.ts";
 
-export function parse(ctx: ParseContext, version: Version): AdditionalLayerInformation {
+export default function parse(ctx: ParseContext, version: Version): AdditionalLayerInformation {
     void parseSigneture(ctx);
     const [key, rawKey] = parseKey(ctx);
     const dataSize = parseDataSize(ctx, rawKey, version);

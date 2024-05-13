@@ -2,7 +2,7 @@ import { ParseContext } from "~/util/parse/mod.ts";
 import { _trie } from "$/tools/GenerateTrie/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 
-export function parse(ctx: ParseContext): [SupportedBlendMode, Uint8Array] {
+export default function parse(ctx: ParseContext): [SupportedBlendMode, Uint8Array] {
     const bin = ctx.takeUint8Array(4);
     const mode = Trie.determine(bin);
     if (mode === undefined) {

@@ -1,8 +1,8 @@
 import { ParseContext, aligned } from "~/util/parse/mod.ts";
-import { parse as parsePascalString } from "~/parse/PascalString.ts";
+import parsePascalString from "~/parse/PascalString.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 
-export function parse(ctx: ParseContext): ImageResourceBlock {
+export default function parse(ctx: ParseContext): ImageResourceBlock {
     void parseBlockSigneture(ctx);
     const imageResourceId = parseImageResourceId(ctx);
     const name = aligned(parsePascalString, 2)(ctx);

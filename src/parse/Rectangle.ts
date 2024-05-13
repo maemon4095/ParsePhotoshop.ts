@@ -1,6 +1,6 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 
-export function parse(ctx: ParseContext): Rectangle {
+export default function parse(ctx: ParseContext): Rectangle {
     const top = ctx.takeInt32();
     const left = ctx.takeInt32();
     const bottom = ctx.takeInt32();

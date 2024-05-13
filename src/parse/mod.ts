@@ -1,10 +1,10 @@
 // https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/#50577409_72092
 
 import { ParseContext } from "~/util/parse/mod.ts";
-import { parse as parseFileHeader } from "~/parse/FileHeader.ts";
-import { parse as parseColorModeData } from "~/parse/ColorModeData.ts";
-import { parse as parseImageResources } from "~/parse/ImageResources.ts";
-import { parse as parseLayerAndMaskInformation } from "~/parse/LayerAndMaskInformation.ts";
+import parseFileHeader from "~/parse/FileHeaderSection.ts";
+import parseColorModeData from "~/parse/ColorModeDataSection.ts";
+import parseImageResources from "~/parse/ImageResourcesSection.ts";
+import parseLayerAndMaskInformation from "~/parse/LayerAndMaskInformationSection.ts";
 import parseImageDataSection from "~/parse/ImageDataSection.ts";
 
 // 全データはbig-endianで保存される.

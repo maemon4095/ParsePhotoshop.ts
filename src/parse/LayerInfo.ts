@@ -1,9 +1,9 @@
 import { ParseContext } from "~/util/parse/mod.ts";
-import { ColorDepth, Version } from "~/parse/FileHeader.ts";
-import { LayerRecords, parse as parseLayerRecord } from "~/parse/LayerRecords.ts";
-import { ChannelImage, parse as parseImageData } from "~/parse/ChannelImage.ts";
+import { ColorDepth, Version } from "~/parse/FileHeaderSection.ts";
+import parseLayerRecord, { LayerRecords } from "~/parse/LayerRecords.ts";
+import parseImageData, { ChannelImage } from "~/parse/ChannelImage.ts";
 
-export function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerInfo | null {
+export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerInfo | null {
     const sectionLength = (() => {
         switch (version) {
             case Version.PSD:
