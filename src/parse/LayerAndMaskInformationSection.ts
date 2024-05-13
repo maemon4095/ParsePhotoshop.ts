@@ -4,7 +4,7 @@ import parseLayerInfo, { LayerInfo } from "~/parse/LayerInfo.ts";
 import parseGlobalLayerMaskInfo, { GlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
 import parseAdditionalLayerInfo, { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation.gen.ts";
 
-export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerAndMaskInformationSection | null {
+export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerAndMaskInformationSection {
     const sectionLength = (() => {
         switch (version) {
             case Version.PSD:
@@ -13,15 +13,21 @@ export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version
                 return Number(ctx.takeUint64());
         }
     })();
-    if (sectionLength === 0) {
-        return null;
-    }
     const start = ctx.byteOffset;
-    const layerInfo = parseLayerInfo(ctx, colorDepth, version);
-    const globalLayerMaskInfo = parseGlobalLayerMaskInfo(ctx);
-    const consumed = ctx.byteOffset - start;
+    const layerInfo = (() => {
+        if (sectionLength === 0) {
+            return null;
+        }
+        return parseLayerInfo(ctx, colorDepth, version);
+    })();
+    const globalLayerMaskInfo = (() => {
+        if (sectionLength === ctx.byteOffset - start) {
+            return null;
+        }
+        return parseGlobalLayerMaskInfo(ctx);
+    })();
     const additionalLayerInformations: AdditionalLayerInformation[] = [];
-    let spaceLeft = sectionLength - consumed;
+    let spaceLeft = sectionLength - (ctx.byteOffset - start);
     while (spaceLeft > 0) {
         const start = ctx.byteOffset;
         const info = parseAdditionalLayerInfo(ctx, version);

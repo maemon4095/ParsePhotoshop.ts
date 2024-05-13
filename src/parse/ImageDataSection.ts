@@ -52,6 +52,7 @@ type ImageDataMap = {
     [ImageDataCompression.ZIP_Prediction]: never;
 };
 
+/** the fifth(last) section of Photoshop file. */
 export type ImageDataSection = ImageDataMap[ImageDataCompression];
 
 export type ImageDataRLE = {
