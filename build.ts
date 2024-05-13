@@ -14,28 +14,44 @@ const generatedFileHeader = `/*
                 DO NOT EDIT.
 */\n`;
 
+const srcDir = "./src";
+
+for await (const entry of fs.expandGlob(`${srcDir}/**/*.gen.ts`)) {
+    if (!entry.isFile) continue;
+    await Deno.remove(entry.path);
+}
+
 switch (mode) {
     case "build": {
-        for await (const entry of fs.expandGlob("./src/**/*.src.ts")) {
-            if (!entry.isFile) continue;
-            await generate(entry.path);
-        }
+        await generateAll((async function* () {
+            for await (const e of fs.walk(srcDir)) {
+                yield e.path;
+            }
+        })());
         break;
     }
     case "watch": {
-        const pattern = /^.*\.src\.ts$/;
-        for await (const entry of Deno.watchFs("./src")) {
-            for (const p of entry.paths) {
-                if (!p.match(pattern)) {
-                    continue;
-                }
-                await generate(p);
+        await generateAll((async function* () {
+            for await (const e of fs.walk(srcDir)) {
+                yield e.path;
             }
-        }
-        break;
+
+            for await (const e of Deno.watchFs("./src")) {
+                yield* e.paths;
+            }
+        })());
     }
 }
 
+async function generateAll(paths: AsyncIterable<string>) {
+    const pattern = /^.*\.src\.ts$/;
+    for await (const path of paths) {
+        if (!path.match(pattern)) {
+            continue;
+        }
+        await generate(path);
+    }
+}
 
 async function generate(path: string) {
     const sourceCode = await Deno.readTextFile(path);
