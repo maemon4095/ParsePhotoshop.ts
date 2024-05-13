@@ -8,6 +8,7 @@ export function parse(ctx: ParseContext, version: Version): AdditionalLayerInfor
     void parseSigneture(ctx);
     const [key, rawKey] = parseKey(ctx);
     const dataSize = parseDataSize(ctx, rawKey, version);
+    const start = ctx.byteOffset;
     const data = (() => {
         switch (key) {
             case SuportedAdjustmentLayerKey.UnicodeLayerName:
@@ -16,6 +17,8 @@ export function parse(ctx: ParseContext, version: Version): AdditionalLayerInfor
                 return parseUnsupportedData(ctx, dataSize);
         }
     })();
+    const consumed = ctx.byteOffset - start;
+    ctx.advance(dataSize - consumed);
     return { ...data, rawKey };
 }
 
@@ -23,6 +26,7 @@ function parseSigneture(ctx: ParseContext) {
     const bin = ctx.peekUint8Array(4);
     const sig = SignetureTrie.determine(bin);
     if (sig === undefined) {
+        console.error("Invalid additional layer information signeture:", bin);
         throw new InvalidAdditionalLayerSigneture(ctx.byteOffset);
     }
     ctx.advance(bin.byteLength);
@@ -32,7 +36,7 @@ function parseKey(ctx: ParseContext): [SuportedAdjustmentLayerKey, Uint8Array] {
     const bin = ctx.takeUint8Array(4);
     const key = Trie.determineAdjustmentLayerKey(bin);
     if (key === undefined) {
-        console.warn("Unsupported adjustment layer key was detected.");
+        console.warn("Unsupported adjustment layer key was detected.", String.fromCodePoint(...bin));
     }
     return [key ?? SuportedAdjustmentLayerKey.Unsupported, bin];
 }

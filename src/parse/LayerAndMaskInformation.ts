@@ -17,6 +17,7 @@ export function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Versio
     }
     const layerInfo = parseLayerInfo(ctx, colorDepth, version);
     const globalLayerMaskInfo = parseGlobalLayerMaskInfo(ctx);
+    // NOTE: 仕様書には additional layer information があることになっているが、layer records に存在するためドキュメントの誤りと思われる。
     return { layerInfo, globalLayerMaskInfo };
 }
 

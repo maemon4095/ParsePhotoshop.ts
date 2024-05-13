@@ -27,7 +27,6 @@ function parseChannelImageCompression(ctx: ParseContext): ChannelImageCompressio
 function parseImageRaw(ctx: ParseContext, depth: ColorDepth, layerRecords: LayerRecords): ChannelImageRaw {
     const rect = layerRecords.enclosingRectangle;
     const imageSize = (rect.bottom - rect.top) * (rect.right - rect.left);
-    console.log(imageSize);
     const dataLength = (() => {
         if (depth === 1) {
             return Math.ceil(imageSize / 8);

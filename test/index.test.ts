@@ -1,4 +1,4 @@
 import { parse } from "~/mod.ts";
-const test_file = Deno.env.get("TEST_FILE")!;
-const file = await Deno.readFile(test_file);
+
+const file = await Deno.readFile(Deno.args[0]);
 parse(file.buffer);

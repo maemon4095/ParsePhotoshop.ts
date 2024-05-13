@@ -3,6 +3,8 @@ import * as fs from "https://deno.land/std@0.224.0/fs/mod.ts";
 import { transform, SourceGenerator } from "./tools/SourceGenerator/mod.ts";
 import { TrieGenerator } from "./tools/GenerateTrie/mod.ts";
 
+const mode = Deno.args[0];
+
 const generators: SourceGenerator[] = [
     TrieGenerator()
 ];
@@ -12,21 +14,41 @@ const generatedFileHeader = `/*
                 DO NOT EDIT.
 */\n`;
 
-for await (const entry of fs.expandGlob("./src/**/*.src.ts")) {
-    if (!entry.isFile) continue;
+switch (mode) {
+    case "build": {
+        for await (const entry of fs.expandGlob("./src/**/*.src.ts")) {
+            if (!entry.isFile) continue;
+            await generate(entry.path);
+        }
+        break;
+    }
+    case "watch": {
+        const pattern = /^.*\.src\.ts$/;
+        for await (const entry of Deno.watchFs("./src")) {
+            for (const p of entry.paths) {
+                if (!p.match(pattern)) {
+                    continue;
+                }
+                await generate(p);
+            }
+        }
+        break;
+    }
+}
 
-    const sourceCode = await Deno.readTextFile(entry.path);
-    const sourceFile = ts.createSourceFile(entry.path, sourceCode, ts.ScriptTarget.ESNext);
+
+async function generate(path: string) {
+    const sourceCode = await Deno.readTextFile(path);
+    const sourceFile = ts.createSourceFile(path, sourceCode, ts.ScriptTarget.ESNext);
     const generated = await transform(sourceFile, generators);
     if (generated === sourceFile) {
-        continue;
+        return;
     }
-    const distPath = replaceExt(entry.path, ".gen.ts");
+    const distPath = replaceExt(path, ".gen.ts");
     const content = generatedFileHeader + generated.getFullText();
     console.log("Generated:", distPath);
     await Deno.writeTextFile(distPath, content);
 }
-
 
 function replaceExt(p: string, ext: string) {
     const pattern = /^.*?(?<ext>(\.[^/\\\.]+)*)$/;
