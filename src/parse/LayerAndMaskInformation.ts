@@ -1,9 +1,10 @@
 import { ParseContext } from "~/util/parse/mod.ts";
-import { Version } from "~/parse/FileHeader.ts";
+import { ColorDepth, Version } from "~/parse/FileHeader.ts";
 import { LayerInfo, parse as parseLayerInfo } from "~/parse/LayerInfo.ts";
+import { GlobalLayerMaskInfo, parse as parseGlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
 
-export function parse(ctx: ParseContext, version: Version): LayerAndMaskInformation {
-    const sectionSize = (() => {
+export function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerAndMaskInformation | null {
+    const sectionLength = (() => {
         switch (version) {
             case Version.PSD:
                 return BigInt(ctx.takeUint32());
@@ -11,14 +12,17 @@ export function parse(ctx: ParseContext, version: Version): LayerAndMaskInformat
                 return ctx.takeUint64();
         }
     })();
-
-    const layerInfo = parseLayerInfo(ctx, version);
-
-    throw new Error("TODO");
+    if (sectionLength === 0n) {
+        return null;
+    }
+    const layerInfo = parseLayerInfo(ctx, colorDepth, version);
+    const globalLayerMaskInfo = parseGlobalLayerMaskInfo(ctx);
+    return { layerInfo, globalLayerMaskInfo };
 }
 
 
 /** The fourth section of a Photoshop file */
 export type LayerAndMaskInformation = {
-    layerInfo: LayerInfo;
+    layerInfo: LayerInfo | null;
+    globalLayerMaskInfo: GlobalLayerMaskInfo | null;
 };

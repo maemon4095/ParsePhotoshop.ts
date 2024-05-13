@@ -15,6 +15,6 @@ export function parse(buffer: ArrayBuffer) {
     console.log("ColorModeData:", colorModeData);
     const imageResources = parseImageResources(ctx);
     console.log("imageResources:", imageResources);
-    const layerAndMaskInformation = parseLayerAndMaskInformation(ctx, fileHeader.version);
+    const layerAndMaskInformation = parseLayerAndMaskInformation(ctx, fileHeader.colorDepth, fileHeader.version);
     console.log("layerAndMaskInformation:", layerAndMaskInformation);
 }

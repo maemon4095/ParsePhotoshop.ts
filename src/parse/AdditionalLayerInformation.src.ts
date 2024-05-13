@@ -8,7 +8,6 @@ export function parse(ctx: ParseContext, version: Version): AdditionalLayerInfor
     void parseSigneture(ctx);
     const [key, rawKey] = parseKey(ctx);
     const dataSize = parseDataSize(ctx, rawKey, version);
-    console.log(dataSize);
     const data = (() => {
         switch (key) {
             case SuportedAdjustmentLayerKey.UnicodeLayerName:

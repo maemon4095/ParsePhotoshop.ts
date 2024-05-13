@@ -1,9 +1,9 @@
 import { ParseContext } from "~/util/parse/mod.ts";
-import { Version } from "~/parse/FileHeader.ts";
+import { ColorDepth, Version } from "~/parse/FileHeader.ts";
 import { LayerRecords, parse as parseLayerRecord } from "~/parse/LayerRecords.ts";
-import { ChannelImageData, parse as parseImageData } from "~/parse/ChannelImageData.ts";
+import { ChannelImage, parse as parseImageData } from "~/parse/ChannelImageData.ts";
 
-export function parse(ctx: ParseContext, version: Version): LayerInfo {
+export function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerInfo | null {
     const sectionLength = (() => {
         switch (version) {
             case Version.PSD:
@@ -12,6 +12,9 @@ export function parse(ctx: ParseContext, version: Version): LayerInfo {
                 return ctx.takeUint64();
         }
     })();
+    if (sectionLength === 0n) {
+        return null;
+    }
 
     const [layerCount, isFirstLayerContainsTransparencyData] = (() => {
         const layerCount = ctx.takeInt16();
@@ -23,15 +26,19 @@ export function parse(ctx: ParseContext, version: Version): LayerInfo {
     })();
 
     const layerRecords: LayerRecords[] = new Array(layerCount);
+    const perLayerImages: ChannelImage[][] = new Array(layerCount);
     for (let i = 0; i < layerCount; ++i) {
         const record = parseLayerRecord(ctx, version);
         layerRecords[i] = record;
+        perLayerImages[i] = new Array(record.channelCount);
     }
 
-    const imageData: ChannelImageData[] = new Array(layerCount);
     for (let i = 0; i < layerCount; ++i) {
-        const record = parseImageData(ctx, version);
-        imageData[i] = record;
+        const imageDataArray = perLayerImages[i];
+        for (let j = 0; j < imageDataArray.length; ++j) {
+            const data = parseImageData(ctx, colorDepth, version, layerRecords[i]);
+            imageDataArray[j] = data;
+        }
     }
 
     return {
@@ -39,7 +46,7 @@ export function parse(ctx: ParseContext, version: Version): LayerInfo {
         isFirstLayerContainsTransparencyData,
         layerCount,
         layerRecords,
-        imageData
+        perLayerImages
     };
 }
 
@@ -48,5 +55,5 @@ export type LayerInfo = {
     isFirstLayerContainsTransparencyData: boolean,
     layerCount: number,
     layerRecords: LayerRecords[];
-    imageData: ChannelImageData[];
+    perLayerImages: ChannelImage[][];
 };
