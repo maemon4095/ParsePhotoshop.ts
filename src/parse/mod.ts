@@ -36,6 +36,6 @@ export type PhotoshopFile = {
     fileHeader: FileHeaderSection;
     colorModeData: ColorModeDataSection;
     imageResources: ImageResourcesSection;
-    layerAndMaskInformation: LayerAndMaskInformationSection | null;
+    layerAndMaskInformation: LayerAndMaskInformationSection;
     imageDataSection: ImageDataSection | null;
 };
