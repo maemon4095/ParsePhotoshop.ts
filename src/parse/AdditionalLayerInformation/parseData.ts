@@ -9,6 +9,7 @@ import parseBlendInteriorElements, { BlendInteriorElements } from "~/parse/Addit
 import parseKnockoutSetting, { KnockoutSetting } from "~/parse/AdditionalLayerInformation/KnockoutSetting.ts";
 import parseProtectedSetting, { ProtectedSetting } from "~/parse/AdditionalLayerInformation/ProtectedSetting.ts";
 import parseSheetColorSetting, { SheetColorSetting } from "~/parse/AdditionalLayerInformation/SheetColorSetting.ts";
+import parseSectionDividerSetting, { SectionDividerSetting } from "~/parse/AdditionalLayerInformation/SectionDividerSetting.ts";
 
 export default function parse(ctx: ParseContext, dataSize: number, key: SuportedAdjustmentLayerKey, _version: Version): AdditionalLayerData {
     switch (key) {
@@ -28,6 +29,8 @@ export default function parse(ctx: ParseContext, dataSize: number, key: Suported
             return parseProtectedSetting(ctx);
         case SuportedAdjustmentLayerKey.SheetColorSetting:
             return parseSheetColorSetting(ctx);
+        case SuportedAdjustmentLayerKey.SectionDividerSetting:
+            return parseSectionDividerSetting(ctx, dataSize);
     }
 }
 
@@ -40,6 +43,7 @@ type AdjustmentLayerKeyMap = {
     [SuportedAdjustmentLayerKey.KnockoutSetting]: KnockoutSetting;
     [SuportedAdjustmentLayerKey.ProtectedSetting]: ProtectedSetting;
     [SuportedAdjustmentLayerKey.SheetColorSetting]: SheetColorSetting;
+    [SuportedAdjustmentLayerKey.SectionDividerSetting]: SectionDividerSetting;
 };
 
 export type AdditionalLayerData = AdjustmentLayerKeyMap[SuportedAdjustmentLayerKey];

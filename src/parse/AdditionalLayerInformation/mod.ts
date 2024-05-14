@@ -58,6 +58,7 @@ export enum SuportedAdjustmentLayerKey {
     KnockoutSetting,
     ProtectedSetting,
     SheetColorSetting,
+    SectionDividerSetting,
 }
 
 export class InvalidAdditionalLayerSigneture extends SyntaxError {
@@ -66,8 +67,3 @@ export class InvalidAdditionalLayerSigneture extends SyntaxError {
         this.message = "Additional layer signeture must be `8BIM` or `8B64`.";
     }
 }
-
-
-
-
-

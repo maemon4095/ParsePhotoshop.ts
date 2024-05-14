@@ -31,6 +31,7 @@ export class Determine {
         'knko': SuportedAdjustmentLayerKey.KnockoutSetting,
         'lspf': SuportedAdjustmentLayerKey.ProtectedSetting,
         'lclr': SuportedAdjustmentLayerKey.SheetColorSetting,
+        'lsct': SuportedAdjustmentLayerKey.SectionDividerSetting,
     })
     static adjustmentLayerKey(_array: Uint8Array): SuportedAdjustmentLayerKey | undefined {
         throw new Error("not generated");
