@@ -26,15 +26,15 @@ export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version
     })();
 
     const layerRecords: LayerRecords[] = new Array(layerCount);
-    const perLayerImages: ImageChannel[][] = new Array(layerCount);
+    const perLayerChannels: ImageChannel[][] = new Array(layerCount);
     for (let i = 0; i < layerCount; ++i) {
         const record = parseLayerRecord(ctx, version);
         layerRecords[i] = record;
-        perLayerImages[i] = new Array(record.channelCount);
+        perLayerChannels[i] = new Array(record.channelCount);
     }
 
     for (let i = 0; i < layerCount; ++i) {
-        const imageDataArray = perLayerImages[i];
+        const imageDataArray = perLayerChannels[i];
         for (let j = 0; j < imageDataArray.length; ++j) {
             const data = parseImageData(ctx, colorDepth, version, layerRecords[i]);
             imageDataArray[j] = data;
@@ -49,7 +49,7 @@ export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version
         isFirstLayerContainsTransparencyData,
         layerCount,
         layerRecords,
-        perLayerImages
+        perLayerChannels
     };
 }
 
@@ -57,5 +57,5 @@ export type LayerInfo = {
     isFirstLayerContainsTransparencyData: boolean,
     layerCount: number,
     layerRecords: LayerRecords[];
-    perLayerImages: ImageChannel[][];
+    perLayerChannels: ImageChannel[][];
 };

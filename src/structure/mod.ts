@@ -1,6 +1,6 @@
 import { ParseOptions, PhotoshopFile } from "~/parse/mod.ts";
 import { LayerRecords } from "~/parse/LayerRecords.ts";
-import { ChannelImage } from "~/parse/ChannelImage.ts";
+import { ImageChannel } from "~/parse/ImageChannel.ts";
 import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 import { decode as decodeText } from "~/util/encoding/mod.ts";
 import { SectionDividerSetting, SectionDividerType } from "~/parse/AdditionalLayerInformation/SectionDividerSetting.ts";
@@ -51,7 +51,7 @@ export function constructPhotoshopStructureFrom(photoshopFile: PhotoshopFile): P
     const imageData: PhotoshopImageData | null = photoshopFile.imageDataSection;
     const blocks = photoshopFile.imageResources.blocks;
     const layerRecords = photoshopFile.layerAndMaskInformation.layerInfo?.layerRecords ?? [];
-    const perLayerImages = photoshopFile.layerAndMaskInformation.layerInfo?.perLayerImages ?? [];
+    const perLayerImages = photoshopFile.layerAndMaskInformation.layerInfo?.perLayerChannels ?? [];
     const { roots: children, layers } = collectRoots(layerRecords, perLayerImages);
     const { additionalLayerInformations, globalLayerMaskInfo } = photoshopFile.layerAndMaskInformation;
 
@@ -67,19 +67,19 @@ export function constructPhotoshopStructureFrom(photoshopFile: PhotoshopFile): P
     };
 }
 
-function collectRoots(layerRecords: LayerRecords[], perLayerImages: ChannelImage[][]): {
+function collectRoots(layerRecords: LayerRecords[], perLayerChannels: ImageChannel[][]): {
     roots: (Group | Layer)[];
     layers: Layer[];
 } {
     // layer は最も背面から並んでいる。
     layerRecords = layerRecords.toReversed();
-    perLayerImages = perLayerImages.toReversed();
+    perLayerChannels = perLayerChannels.toReversed();
     const layers: Layer[] = [];
     const roots: (Group | Layer)[] = [];
     const groupStack: Group[] = [];
 
     for (let i = 0; i < layerRecords.length; ++i) {
-        const node = processRecord(layerRecords[i], perLayerImages[i]);
+        const node = processRecord(layerRecords[i], perLayerChannels[i]);
 
         if (node === END_OF_GROUP) {
             const group = groupStack.pop()!;
@@ -111,7 +111,7 @@ function collectRoots(layerRecords: LayerRecords[], perLayerImages: ChannelImage
     return { roots, layers };
 }
 
-function processRecord(records: LayerRecords, images: ChannelImage[]): Layer | Group | typeof END_OF_GROUP {
+function processRecord(records: LayerRecords, channels: ImageChannel[]): Layer | Group | typeof END_OF_GROUP {
     let name: string | null = null;
     let dividerSettings: SectionDividerSetting | null = null;
     for (const info of records.additionalLayerInformations) {
@@ -135,7 +135,7 @@ function processRecord(records: LayerRecords, images: ChannelImage[]): Layer | G
     }
     const layerProps: LayerProperties = {
         name,
-        images,
+        channels,
         blendMode: records.blendMode,
         opacity: records.opacity,
         visible: (records.layerFlags & LayerFlags.Visible) === LayerFlags.Visible,
@@ -173,7 +173,7 @@ export type LayerProperties = {
     right: number;
     opacity: number;
     blendMode: SupportedBlendMode;
-    images: ChannelImage[];
+    channels: ImageChannel[];
 };
 
 export type Layer = {
@@ -187,7 +187,7 @@ export type Group = {
 } & LayerProperties;
 
 export type {
-    ChannelImage,
+    ImageChannel,
     SuportedAdjustmentLayerKey, ImageDataRLE,
     ImageDataRaw, ImageResourceBlock,
     ColorDepth, ColorMode,
