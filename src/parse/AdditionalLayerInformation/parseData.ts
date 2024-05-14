@@ -4,6 +4,7 @@ import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/m
 import parseUnicodeLayerName, { UnicodeLayerName } from "~/parse/AdditionalLayerInformation/UnicodeLayerName.ts";
 import parseUnsupportedData, { UnsupportedData } from "~/parse/AdditionalLayerInformation/Unsupported.ts";
 import parseLayerId, { LayerId } from "~/parse/AdditionalLayerInformation/LayerId.ts";
+import parseBlendClippingElements, { BlendClippingElements } from "~/parse/AdditionalLayerInformation/BlendClippingElements.ts";
 
 export default function parse(ctx: ParseContext, dataSize: number, key: SuportedAdjustmentLayerKey, _version: Version) {
     switch (key) {
@@ -13,6 +14,8 @@ export default function parse(ctx: ParseContext, dataSize: number, key: Suported
             return parseUnsupportedData(ctx, dataSize);
         case SuportedAdjustmentLayerKey.LayerId:
             return parseLayerId(ctx);
+        case SuportedAdjustmentLayerKey.BlendClippingElements:
+            return parseBlendClippingElements(ctx);
     }
 }
 
@@ -20,6 +23,7 @@ type AdjustmentLayerKeyMap = {
     [SuportedAdjustmentLayerKey.Unsupported]: UnsupportedData;
     [SuportedAdjustmentLayerKey.UnicodeLayerName]: UnicodeLayerName;
     [SuportedAdjustmentLayerKey.LayerId]: LayerId;
+    [SuportedAdjustmentLayerKey.BlendClippingElements]: BlendClippingElements;
 };
 
 export type AdditionalLayerData = AdjustmentLayerKeyMap[SuportedAdjustmentLayerKey];

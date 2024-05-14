@@ -49,11 +49,11 @@ function parseDataSize(ctx: ParseContext, rawKey: Uint8Array, version: Version):
 
 export type AdditionalLayerInformation = { rawKey: Uint8Array; } & AdditionalLayerData;
 
-
 export enum SuportedAdjustmentLayerKey {
     Unsupported,
     UnicodeLayerName,
     LayerId,
+    BlendClippingElements
 }
 
 export class InvalidAdditionalLayerSigneture extends SyntaxError {

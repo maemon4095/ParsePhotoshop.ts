@@ -26,6 +26,7 @@ export class Determine {
     @_trie({
         'luni': SuportedAdjustmentLayerKey.UnicodeLayerName,
         'lyid': SuportedAdjustmentLayerKey.LayerId,
+        'clbl': SuportedAdjustmentLayerKey.BlendClippingElements
     })
     static adjustmentLayerKey(_array: Uint8Array): SuportedAdjustmentLayerKey | undefined {
         throw new Error("not generated");
