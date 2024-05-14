@@ -150,6 +150,12 @@ function processRecord(records: LayerRecords, images: ChannelImage[]): Layer | G
     if (dividerSettings.type === SectionDividerType.BoundingSectionDivider) {
         return END_OF_GROUP;
     }
+
+    // group's blend mode seems to be always BlendMode.Normal
+    // Therefore override blend mode if set
+    if (dividerSettings.blendMode !== undefined) {
+        layerProps.blendMode = dividerSettings.blendMode;
+    }
     return {
         type: "Group",
         isOpen: dividerSettings.type === SectionDividerType.OpenFolder,
@@ -176,7 +182,7 @@ export type Layer = {
 
 export type Group = {
     type: "Group";
-    isOpen: boolean,
+    isOpen: boolean;
     children: (Layer | Group)[];
 } & LayerProperties;
 
