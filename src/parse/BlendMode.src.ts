@@ -48,7 +48,7 @@ class Trie {
 
 export enum SupportedBlendMode {
     Unsupported,
-    PassThrough,
+    PassThrough, // adjustment layer can affect any below layers
     Normal,
     Dissolve,
     Darken,

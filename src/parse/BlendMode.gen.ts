@@ -19,7 +19,7 @@ class Trie {static determine(_seq: Uint8Array): undefined | SupportedBlendMode {
 
 export enum SupportedBlendMode {
     Unsupported,
-    PassThrough,
+    PassThrough, // adjustment layer can affect any below layers
     Normal,
     Dissolve,
     Darken,
