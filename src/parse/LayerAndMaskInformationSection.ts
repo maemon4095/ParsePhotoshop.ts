@@ -3,6 +3,7 @@ import { ColorDepth, Version } from "~/parse/FileHeaderSection.ts";
 import parseLayerInfo, { LayerInfo } from "~/parse/LayerInfo.ts";
 import parseGlobalLayerMaskInfo, { GlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
 import parseAdditionalLayerInfo, { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation/mod.ts";
+import { SyntaxError } from "~/parse/SyntaxError.ts";
 
 export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version: Version): LayerAndMaskInformationSection {
     const sectionLength = (() => {
@@ -35,6 +36,9 @@ export default function parse(ctx: ParseContext, colorDepth: ColorDepth, version
         const consumed = ctx.byteOffset - start;
         spaceLeft -= consumed;
     }
+    if (spaceLeft < 0) {
+        throw new LayerAndMaskInformationSectionOverflowError(ctx.byteOffset);
+    }
 
     return { layerInfo, globalLayerMaskInfo, additionalLayerInformations };
 }
@@ -46,3 +50,10 @@ export type LayerAndMaskInformationSection = {
     globalLayerMaskInfo: GlobalLayerMaskInfo | null;
     additionalLayerInformations: AdditionalLayerInformation[];
 };
+
+export class LayerAndMaskInformationSectionOverflowError extends SyntaxError {
+    constructor(byteOffset: number) {
+        super(byteOffset);
+        this.message = "Layer and mask information section is overflowed.";
+    }
+} 
