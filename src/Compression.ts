@@ -9,7 +9,7 @@ export function decompressRLE(bin: Uint8Array): Uint8Array {
             continue;
         }
         if (header > 127) {
-            const count = -(header - 256) + 1;
+            const count = 256 - header + 1;
             const byte = bin[idx];
             for (let i = 0; i < count; ++i) {
                 buf.push(byte);
