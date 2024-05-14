@@ -152,6 +152,7 @@ function processRecord(records: LayerRecords, images: ChannelImage[]): Layer | G
     }
     return {
         type: "Group",
+        isOpen: dividerSettings.type === SectionDividerType.OpenFolder,
         children: [],
         ...layerProps,
     };
@@ -175,6 +176,7 @@ export type Layer = {
 
 export type Group = {
     type: "Group";
+    isOpen: boolean,
     children: (Layer | Group)[];
 } & LayerProperties;
 
