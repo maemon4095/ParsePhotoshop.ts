@@ -14,6 +14,7 @@ export default function parse(ctx: ParseContext, version: Version): AdditionalLa
     console.log("additional info size", dataSize);
     const start = ctx.byteOffset;
     const data = parseData(ctx, dataSize, key, version);
+    console.log("additional info: ", data);
     const consumed = ctx.byteOffset - start;
     ctx.advance(dataSize - consumed);
     return { ...data, rawKey };
@@ -46,14 +47,17 @@ function parseDataSize(ctx: ParseContext, rawKey: Uint8Array, version: Version):
     return ctx.takeUint32();
 }
 
-
 export type AdditionalLayerInformation = { rawKey: Uint8Array; } & AdditionalLayerData;
 
 export enum SuportedAdjustmentLayerKey {
     Unsupported,
     UnicodeLayerName,
     LayerId,
-    BlendClippingElements
+    BlendClippingElements,
+    BlendInteriorElements,
+    KnockoutSetting,
+    ProtectedSetting,
+    SheetColorSetting,
 }
 
 export class InvalidAdditionalLayerSigneture extends SyntaxError {
