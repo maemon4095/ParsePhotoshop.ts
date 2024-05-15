@@ -11,12 +11,12 @@ export default function parse(buffer: ArrayBuffer, options?: ParseOptions): Phot
     const fileHeader = parseFileHeader(ctx);
     const colorModeData = parseColorModeData(ctx, fileHeader.colorMode);
     const imageResources = parseImageResources(ctx);
-    const layerAndMaskInformation = parseLayerAndMaskInformation(ctx, fileHeader.colorDepth, fileHeader.version);
+    const layerAndMaskInformation = parseLayerAndMaskInformation(ctx, fileHeader.version);
     const imageDataSection = (() => {
         if (options?.skipImageDataSection) {
             return null;
         }
-        return parseImageDataSection(ctx, fileHeader);
+        return parseImageDataSection(ctx);
     })();
 
     return {

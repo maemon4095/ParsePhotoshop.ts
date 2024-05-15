@@ -1,9 +1,9 @@
 export type Parser<T> = (context: ParseContext) => T;
 
 export class ParseContext {
-    static create(buffer: ArrayBuffer): ParseContext {
+    static create(buffer: ArrayBuffer, byteOffset?: number): ParseContext {
         const view = new DataView(buffer);
-        return new ParseContext(view, 0);
+        return new ParseContext(view, byteOffset ?? 0);
     }
 
     #byteOffset: number;

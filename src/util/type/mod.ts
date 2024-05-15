@@ -1,0 +1,1 @@
+export function unsafeAssert<T>(_arg: unknown): asserts _arg is T { }

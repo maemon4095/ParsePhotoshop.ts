@@ -43,6 +43,7 @@ export default function parse(ctx: ParseContext, version: Version): LayerRecords
     return {
         enclosingRectangle,
         channelCount,
+        channelInfos,
         blendMode,
         rawBlendMode,
         opacity,
@@ -130,6 +131,7 @@ function parseFiller(ctx: ParseContext) {
 
 export type LayerRecords = {
     enclosingRectangle: Rectangle;
+    channelInfos: ChannelInfo[];
     channelCount: number;
     blendMode: SupportedBlendMode;
     rawBlendMode: Uint8Array;

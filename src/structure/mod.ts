@@ -4,8 +4,6 @@ import { ImageChannel } from "~/parse/ImageChannel.ts";
 import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 import { decode as decodeText } from "~/util/encoding/mod.ts";
 import { SectionDividerSetting, SectionDividerType } from "~/parse/AdditionalLayerInformation/SectionDividerSetting.ts";
-import { ImageDataRLE } from "~/parse/ImageDataSection.ts";
-import { ImageDataRaw } from "~/parse/ImageDataSection.ts";
 import { ImageResourceBlock } from "~/parse/ImageResourceBlock.ts";
 import { ColorDepth, ColorMode, Version } from "~/parse/FileHeaderSection.ts";
 import { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation/mod.ts";
@@ -13,6 +11,7 @@ import { GlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
 import { LayerFlags } from "~/parse/LayerRecords.ts";
 import { SupportedBlendMode } from "~/parse/BlendMode.gen.ts";
 import parsePhotoshop from "~/parse/mod.ts";
+import { ImageDataCompression } from "~/parse/ImageCompression.ts";
 export type { Rectangle } from "~/parse/Rectangle.ts";
 export type { ClippingMode } from "~/parse/LayerRecords.ts";
 export type { LayerBlendingRanges } from "~/parse/LayerBlendingRanges.ts";
@@ -33,7 +32,10 @@ export type PhotoshopStrucuture = {
     globalLayerMaskInfo: GlobalLayerMaskInfo | null;
 };
 
-export type PhotoshopImageData = ImageDataRLE | ImageDataRaw;
+export type PhotoshopImageData = {
+    compression: ImageDataCompression;
+    data: Uint8Array;
+};
 export type ImageResources = {
     blocks: ImageResourceBlock[];
 };
@@ -186,12 +188,13 @@ export type Group = {
     children: (Layer | Group)[];
 } & LayerProperties;
 
+export { Version, SupportedBlendMode, ColorMode };
+
 export type {
     ImageChannel,
-    SuportedAdjustmentLayerKey, ImageDataRLE,
-    ImageDataRaw, ImageResourceBlock,
-    ColorDepth, ColorMode,
-    Version, AdditionalLayerInformation,
-    SupportedBlendMode,
+    SuportedAdjustmentLayerKey,
+    ImageDataCompression, ImageResourceBlock,
+    ColorDepth,
+    AdditionalLayerInformation,
     ParseOptions
 };
