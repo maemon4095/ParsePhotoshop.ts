@@ -135,6 +135,7 @@ export type LayerRecords = {
     channelCount: number;
     blendMode: SupportedBlendMode;
     rawBlendMode: Uint8Array;
+    /** 0 = transparent, 255 = opaque */
     opacity: number;
     clippingMode: ClippingMode;
     layerFlags: LayerFlags;

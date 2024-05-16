@@ -20,10 +20,7 @@ export function decodeLayer(file: PhotoshopFile, layer: LayerRecords, channels: 
         case ColorMode.Lab:
             throw new Error("Unsupported color mode.");
     }
-
-    throw null;
 }
-
 
 function decodeLayerRGB(file: PhotoshopFile, layer: LayerRecords, channels: ImageChannel[]): ImageData {
     const colorDepth = file.fileHeader.colorDepth;
@@ -44,7 +41,7 @@ function decodeLayerRGB(file: PhotoshopFile, layer: LayerRecords, channels: Imag
     const height = file.fileHeader.height;
     const width = file.fileHeader.width;
     const buffer = new Uint8ClampedArray(height * width * 4);
-    buffer.fill(255);
+    buffer.fill(layer.opacity);
 
     // R, G, B order
     for (let ch = 0; ch < channels.length; ++ch) {
@@ -74,7 +71,7 @@ function decodeLayerIndexed(file: PhotoshopFile, layer: LayerRecords, channels: 
     const height = file.fileHeader.height;
     const width = file.fileHeader.width;
     const buffer = new Uint8ClampedArray(height * width * 4);
-    buffer.fill(255);
+    buffer.fill(layer.opacity);
 
     // R, G, B order
     for (let ch = 0; ch < channels.length; ++ch) {
