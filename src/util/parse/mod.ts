@@ -22,7 +22,6 @@ export class ParseContext {
         return this.#view.byteLength - this.#byteOffset;
     }
 
-
     seekTo(byteOffset: number) {
         this.#byteOffset = byteOffset;
     }

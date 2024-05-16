@@ -12,11 +12,14 @@ import { LayerFlags } from "~/parse/LayerRecords.ts";
 import { SupportedBlendMode } from "~/parse/BlendMode.gen.ts";
 import parsePhotoshop from "~/parse/mod.ts";
 import { ImageDataCompression } from "~/parse/ImageCompression.ts";
+import { decodeLayer } from "~/decoding/mod.ts";
 export type { Rectangle } from "~/parse/Rectangle.ts";
 export type { ClippingMode } from "~/parse/LayerRecords.ts";
 export type { LayerBlendingRanges } from "~/parse/LayerBlendingRanges.ts";
 
+
 export type PhotoshopStrucuture = {
+    type: "Photoshop",
     height: number;
     width: number;
     channelCount: number;
@@ -26,7 +29,7 @@ export type PhotoshopStrucuture = {
     colorModeData: Uint8Array;
     imageResources: ImageResources;
     imageData: PhotoshopImageData | null;
-    children: (Group | Layer)[];
+    roots: (Group | Layer)[];
     layers: Layer[];
     additionalLayerInformations: AdditionalLayerInformation[];
     globalLayerMaskInfo: GlobalLayerMaskInfo | null;
@@ -47,54 +50,78 @@ export function parse(buffer: ArrayBuffer, options?: ParseOptions): PhotoshopStr
     return constructPhotoshopStructureFrom(file);
 }
 
-export function constructPhotoshopStructureFrom(photoshopFile: PhotoshopFile): PhotoshopStrucuture {
-    const colorModeData = photoshopFile.colorModeData.data;
-    const { height, width, channelCount, colorDepth, colorMode, version } = photoshopFile.fileHeader;
-    const imageData: PhotoshopImageData | null = photoshopFile.imageDataSection;
-    const blocks = photoshopFile.imageResources.blocks;
-    const layerRecords = photoshopFile.layerAndMaskInformation.layerInfo?.layerRecords ?? [];
-    const perLayerImages = photoshopFile.layerAndMaskInformation.layerInfo?.perLayerChannels ?? [];
-    const { roots: children, layers } = collectRoots(layerRecords, perLayerImages);
-    const { additionalLayerInformations, globalLayerMaskInfo } = photoshopFile.layerAndMaskInformation;
-
-    return {
+export function constructPhotoshopStructureFrom(file: PhotoshopFile): PhotoshopStrucuture {
+    const colorModeData = file.colorModeData.data;
+    const { height, width, channelCount, colorDepth, colorMode, version } = file.fileHeader;
+    const imageData: PhotoshopImageData | null = file.imageDataSection;
+    const blocks = file.imageResources.blocks;
+    const layerRecords = file.layerAndMaskInformation.layerInfo?.layerRecords ?? [];
+    const perLayerImages = file.layerAndMaskInformation.layerInfo?.perLayerChannels ?? [];
+    const { roots, layers } = collectRoots(file, layerRecords, perLayerImages);
+    const { additionalLayerInformations, globalLayerMaskInfo } = file.layerAndMaskInformation;
+    const psd = {
+        type: "Photoshop",
         width, height, channelCount, colorDepth, colorMode, version,
         colorModeData,
         imageData,
         imageResources: { blocks },
-        children,
+        roots,
         layers,
         additionalLayerInformations,
         globalLayerMaskInfo
-    };
+    } as PhotoshopStrucuture;
+
+    for (let i = 0; i < roots.length; ++i) {
+        roots[i].parent = psd;
+    }
+
+    return psd;
 }
 
-function collectRoots(layerRecords: LayerRecords[], perLayerChannels: ImageChannel[][]): {
-    roots: (Group | Layer)[];
+export function getPhotoshop(node: Layer | Group | PhotoshopStrucuture): PhotoshopStrucuture {
+    while (node.type !== "Photoshop") {
+        node = node.parent;
+    }
+    return node;
+}
+
+type Optional<T, K extends keyof T> = Omit<T, K> & { [p in K]?: T[p] };
+
+function collectRoots(file: PhotoshopFile, layerRecords: LayerRecords[], perLayerChannels: ImageChannel[][]): {
+    roots: (Optional<Group, "parent"> | Optional<Layer, "parent">)[];
     layers: Layer[];
 } {
     // layer は最も背面から並んでいる。
     layerRecords = layerRecords.toReversed();
     perLayerChannels = perLayerChannels.toReversed();
     const layers: Layer[] = [];
-    const roots: (Group | Layer)[] = [];
-    const groupStack: Group[] = [];
+    const roots: (Optional<Group, "parent"> | Optional<Layer, "parent">)[] = [];
+    const groupStack: Optional<Group, "parent">[] = [];
 
     for (let i = 0; i < layerRecords.length; ++i) {
-        const node = processRecord(layerRecords[i], perLayerChannels[i]);
+        const node = processRecord(file, layerRecords[i], perLayerChannels[i]);
 
         if (node === END_OF_GROUP) {
             const group = groupStack.pop()!;
-            const parent = (groupStack[0]?.children ?? roots);
-            parent.push(group);
+            const parent = groupStack[0];
+            if (parent === undefined) {
+                roots.push(group);
+            } else {
+                group.parent = parent as Group;
+                parent.children.push(group as Group);
+            }
             continue;
         }
 
         if (node.type === "Layer") {
-            const group = groupStack[groupStack.length - 1];
-            const parent = (group?.children ?? roots);
-            parent.push(node);
-            layers.push(node);
+            const parent = groupStack[groupStack.length - 1];
+            if (parent === undefined) {
+                roots.push(node);
+            } else {
+                node.parent = parent as Group;
+                parent.children.push(node as Layer);
+            }
+            layers.push(node as Layer);
         } else {
             groupStack.push(node);
         }
@@ -103,7 +130,7 @@ function collectRoots(layerRecords: LayerRecords[], perLayerChannels: ImageChann
         console.warn("group does not closed properly.");
 
         const g = groupStack.reduceRight((r, l) => {
-            l.children.push(r);
+            l.children.push(r as Group);
             return l;
         });
 
@@ -113,7 +140,7 @@ function collectRoots(layerRecords: LayerRecords[], perLayerChannels: ImageChann
     return { roots, layers };
 }
 
-function processRecord(records: LayerRecords, channels: ImageChannel[]): Layer | Group | typeof END_OF_GROUP {
+function processRecord(file: PhotoshopFile, records: LayerRecords, channels: ImageChannel[]): Optional<Layer, "parent"> | Optional<Group, "parent"> | typeof END_OF_GROUP {
     let name: string | null = null;
     let dividerSettings: SectionDividerSetting | null = null;
     for (const info of records.additionalLayerInformations) {
@@ -135,9 +162,10 @@ function processRecord(records: LayerRecords, channels: ImageChannel[]): Layer |
     if (name === null) {
         name = decodeText(records.layerName);
     }
-    const layerProps: LayerProperties = {
+    const imageData = decodeLayer(file, records, channels);
+    const layerProps: Omit<LayerProperties, "parent"> = {
         name,
-        channels,
+        imageData,
         blendMode: records.blendMode,
         opacity: records.opacity,
         visible: (records.layerFlags & LayerFlags.Visible) === LayerFlags.Visible,
@@ -175,7 +203,8 @@ export type LayerProperties = {
     right: number;
     opacity: number;
     blendMode: SupportedBlendMode;
-    channels: ImageChannel[];
+    imageData: ImageData,
+    parent: Group | PhotoshopStrucuture;
 };
 
 export type Layer = {
@@ -198,3 +227,4 @@ export type {
     AdditionalLayerInformation,
     ParseOptions
 };
+
