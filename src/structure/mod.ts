@@ -30,6 +30,7 @@ export type PhotoshopStrucuture = {
     imageResources: ImageResources;
     imageData: PhotoshopImageData | null;
     roots: (Group | Layer)[];
+    /** all layers in top to bottom order. */
     layers: Layer[];
     additionalLayerInformations: AdditionalLayerInformation[];
     globalLayerMaskInfo: GlobalLayerMaskInfo | null;
