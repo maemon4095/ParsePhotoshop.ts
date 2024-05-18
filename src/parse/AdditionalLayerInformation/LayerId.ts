@@ -1,18 +1,18 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
-import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
+import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 
 export default function parse(ctx: ParseContext): LayerId {
     ctx.takeUint32();
     const id = ctx.takeUint32();
     return {
-        key: SuportedAdjustmentLayerKey.LayerId,
+        key: AdjustmentLayerKey.LayerId,
         id
     };
 }
 
 export type LayerId = {
-    key: SuportedAdjustmentLayerKey.LayerId;
+    key: AdjustmentLayerKey.LayerId;
     id: number;
 };
 

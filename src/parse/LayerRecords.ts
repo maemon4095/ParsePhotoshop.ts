@@ -6,7 +6,7 @@ import parseBlendMode from "~/parse/BlendMode.gen.ts";
 import parseRect, { Rectangle } from "~/parse/Rectangle.ts";
 import parseLayerMask, { LayerMask } from "~/parse/LayerMask.ts";
 import parseLayerBlendingRange, { LayerBlendingRanges } from "~/parse/LayerBlendingRanges.ts";
-import { SupportedBlendMode } from "~/parse/BlendMode.gen.ts";
+import { BlendMode } from "~/parse/BlendMode.gen.ts";
 import parseAdditionalLayerInformation, { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation/mod.ts";
 
 export default function parse(ctx: ParseContext, version: Version): LayerRecords {
@@ -133,7 +133,7 @@ export type LayerRecords = {
     enclosingRectangle: Rectangle;
     channelInfos: ChannelInfo[];
     channelCount: number;
-    blendMode: SupportedBlendMode;
+    blendMode: BlendMode;
     rawBlendMode: Uint8Array;
     /** 0 = transparent, 255 = opaque */
     opacity: number;

@@ -29,13 +29,13 @@ function parseSigneture(ctx: ParseContext) {
     ctx.advance(bin.byteLength);
 }
 
-function parseKey(ctx: ParseContext): [SuportedAdjustmentLayerKey, Uint8Array] {
+function parseKey(ctx: ParseContext): [AdjustmentLayerKey, Uint8Array] {
     const bin = ctx.takeUint8Array(4);
     const key = Determine.adjustmentLayerKey(bin);
     if (key === undefined) {
-        console.warn("Unsupported adjustment layer key was detected.", String.fromCodePoint(...bin));
+        console.warn("Unknown adjustment layer key was detected.", String.fromCodePoint(...bin));
     }
-    return [key ?? SuportedAdjustmentLayerKey.Unsupported, bin];
+    return [key ?? AdjustmentLayerKey.Unknown, bin];
 }
 
 function parseDataSize(ctx: ParseContext, rawKey: Uint8Array, version: Version): number {
@@ -49,8 +49,8 @@ function parseDataSize(ctx: ParseContext, rawKey: Uint8Array, version: Version):
 
 export type AdditionalLayerInformation = { rawKey: Uint8Array; } & AdditionalLayerData;
 
-export enum SuportedAdjustmentLayerKey {
-    Unsupported,
+export enum AdjustmentLayerKey {
+    Unknown,
     UnicodeLayerName,
     LayerId,
     BlendClippingElements,

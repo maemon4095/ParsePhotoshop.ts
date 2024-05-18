@@ -1,13 +1,13 @@
-import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
+import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 import { ParseContext } from "~/util/parse/mod.ts";
 
 export default function parse(ctx: ParseContext): KnockoutSetting {
     const knockout = ctx.takeUint8() !== 0;
     ctx.advance(3);
-    return { key: SuportedAdjustmentLayerKey.KnockoutSetting, knockout };
+    return { key: AdjustmentLayerKey.KnockoutSetting, knockout };
 }
 
 export type KnockoutSetting = {
-    key: SuportedAdjustmentLayerKey.KnockoutSetting;
+    key: AdjustmentLayerKey.KnockoutSetting;
     knockout: boolean;
 };

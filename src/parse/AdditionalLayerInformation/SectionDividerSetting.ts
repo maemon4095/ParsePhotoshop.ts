@@ -1,12 +1,12 @@
-import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
+import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 import { ParseContext } from "~/util/parse/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 import { Determine, Signeture } from "~/parse/AdditionalLayerInformation/helper.gen.ts";
-import parseBlendMode, { SupportedBlendMode } from "~/parse/BlendMode.gen.ts";
+import parseBlendMode, { BlendMode } from "~/parse/BlendMode.gen.ts";
 
 export default function parse(ctx: ParseContext, dataLength: number): SectionDividerSetting {
     const data = parseCore(ctx, dataLength);
-    return { key: SuportedAdjustmentLayerKey.SectionDividerSetting, ...data };
+    return { key: AdjustmentLayerKey.SectionDividerSetting, ...data };
 }
 
 function parseCore(ctx: ParseContext, dataLength: number): Omit<SectionDividerSetting, "key"> {
@@ -51,9 +51,9 @@ function parseSectionDividerSubType(ctx: ParseContext): SectionDividerSubType {
 }
 
 export type SectionDividerSetting = {
-    key: SuportedAdjustmentLayerKey.SectionDividerSetting;
+    key: AdjustmentLayerKey.SectionDividerSetting;
     type: SectionDividerType;
-    blendMode?: SupportedBlendMode,
+    blendMode?: BlendMode,
     rawBlendMode?: Uint8Array,
     subType?: SectionDividerSubType;
 };

@@ -1,5 +1,5 @@
 import { _trie } from "$/tools/GenerateTrie/mod.ts";
-import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
+import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 
 export enum Signeture {
     _8BIM,
@@ -24,16 +24,16 @@ export class Determine {
     }
 
     @_trie({
-        'luni': SuportedAdjustmentLayerKey.UnicodeLayerName,
-        'lyid': SuportedAdjustmentLayerKey.LayerId,
-        'clbl': SuportedAdjustmentLayerKey.BlendClippingElements,
-        'infx': SuportedAdjustmentLayerKey.BlendInteriorElements,
-        'knko': SuportedAdjustmentLayerKey.KnockoutSetting,
-        'lspf': SuportedAdjustmentLayerKey.ProtectedSetting,
-        'lclr': SuportedAdjustmentLayerKey.SheetColorSetting,
-        'lsct': SuportedAdjustmentLayerKey.SectionDividerSetting,
+        'luni': AdjustmentLayerKey.UnicodeLayerName,
+        'lyid': AdjustmentLayerKey.LayerId,
+        'clbl': AdjustmentLayerKey.BlendClippingElements,
+        'infx': AdjustmentLayerKey.BlendInteriorElements,
+        'knko': AdjustmentLayerKey.KnockoutSetting,
+        'lspf': AdjustmentLayerKey.ProtectedSetting,
+        'lclr': AdjustmentLayerKey.SheetColorSetting,
+        'lsct': AdjustmentLayerKey.SectionDividerSetting,
     })
-    static adjustmentLayerKey(_array: Uint8Array): SuportedAdjustmentLayerKey | undefined {
+    static adjustmentLayerKey(_array: Uint8Array): AdjustmentLayerKey | undefined {
         throw new Error("not generated");
     }
 }

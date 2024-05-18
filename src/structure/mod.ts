@@ -1,7 +1,7 @@
 import { ParseOptions, PhotoshopFile } from "~/parse/mod.ts";
 import { LayerRecords } from "~/parse/LayerRecords.ts";
 import { ImageChannel } from "~/parse/ImageChannel.ts";
-import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
+import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 import { decode as decodeText } from "~/util/encoding/mod.ts";
 import { SectionDividerSetting, SectionDividerType } from "~/parse/AdditionalLayerInformation/SectionDividerSetting.ts";
 import { ImageResourceBlock } from "~/parse/ImageResourceBlock.ts";
@@ -9,7 +9,7 @@ import { ColorDepth, ColorMode, Version } from "~/parse/FileHeaderSection.ts";
 import { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation/mod.ts";
 import { GlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
 import { LayerFlags } from "~/parse/LayerRecords.ts";
-import { SupportedBlendMode } from "~/parse/BlendMode.gen.ts";
+import { BlendMode } from "~/parse/BlendMode.gen.ts";
 import parsePhotoshop from "~/parse/mod.ts";
 import { ImageDataCompression } from "~/parse/ImageCompression.ts";
 import { decodeLayer } from "~/decoding/mod.ts";
@@ -146,13 +146,13 @@ function processRecord(file: PhotoshopFile, records: LayerRecords, channels: Ima
     let dividerSettings: SectionDividerSetting | null = null;
     for (const info of records.additionalLayerInformations) {
         switch (info.key) {
-            case SuportedAdjustmentLayerKey.Unsupported:
+            case AdjustmentLayerKey.Unknown:
                 continue;
-            case SuportedAdjustmentLayerKey.UnicodeLayerName: {
+            case AdjustmentLayerKey.UnicodeLayerName: {
                 name = info.name;
                 break;
             }
-            case SuportedAdjustmentLayerKey.SectionDividerSetting: {
+            case AdjustmentLayerKey.SectionDividerSetting: {
                 dividerSettings = info;
                 break;
             }
@@ -203,7 +203,7 @@ export type LayerProperties = {
     left: number;
     right: number;
     opacity: number;
-    blendMode: SupportedBlendMode;
+    blendMode: BlendMode;
     imageData: ImageData,
     parent: Group | PhotoshopStrucuture;
 };
@@ -218,11 +218,11 @@ export type Group = {
     children: (Layer | Group)[];
 } & LayerProperties;
 
-export { Version, SupportedBlendMode, ColorMode };
+export { Version, BlendMode, ColorMode };
 
 export type {
     ImageChannel,
-    SuportedAdjustmentLayerKey,
+    AdjustmentLayerKey,
     ImageDataCompression, ImageResourceBlock,
     ColorDepth,
     AdditionalLayerInformation,

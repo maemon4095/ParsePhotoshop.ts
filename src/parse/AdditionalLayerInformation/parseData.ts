@@ -1,6 +1,6 @@
 import { ParseContext } from "~/util/parse/mod.ts";
 import { Version } from "~/parse/FileHeaderSection.ts";
-import { SuportedAdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
+import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 import parseUnicodeLayerName, { UnicodeLayerName } from "~/parse/AdditionalLayerInformation/UnicodeLayerName.ts";
 import parseUnsupportedData, { UnsupportedData } from "~/parse/AdditionalLayerInformation/Unsupported.ts";
 import parseLayerId, { LayerId } from "~/parse/AdditionalLayerInformation/LayerId.ts";
@@ -11,39 +11,39 @@ import parseProtectedSetting, { ProtectedSetting } from "~/parse/AdditionalLayer
 import parseSheetColorSetting, { SheetColorSetting } from "~/parse/AdditionalLayerInformation/SheetColorSetting.ts";
 import parseSectionDividerSetting, { SectionDividerSetting } from "~/parse/AdditionalLayerInformation/SectionDividerSetting.ts";
 
-export default function parse(ctx: ParseContext, dataSize: number, key: SuportedAdjustmentLayerKey, _version: Version): AdditionalLayerData {
+export default function parse(ctx: ParseContext, dataSize: number, key: AdjustmentLayerKey, _version: Version): AdditionalLayerData {
     switch (key) {
-        case SuportedAdjustmentLayerKey.Unsupported:
+        case AdjustmentLayerKey.Unknown:
             return parseUnsupportedData(ctx, dataSize);
-        case SuportedAdjustmentLayerKey.UnicodeLayerName:
+        case AdjustmentLayerKey.UnicodeLayerName:
             return parseUnicodeLayerName(ctx);
-        case SuportedAdjustmentLayerKey.LayerId:
+        case AdjustmentLayerKey.LayerId:
             return parseLayerId(ctx);
-        case SuportedAdjustmentLayerKey.BlendClippingElements:
+        case AdjustmentLayerKey.BlendClippingElements:
             return parseBlendClippingElements(ctx);
-        case SuportedAdjustmentLayerKey.BlendInteriorElements:
+        case AdjustmentLayerKey.BlendInteriorElements:
             return parseBlendInteriorElements(ctx);
-        case SuportedAdjustmentLayerKey.KnockoutSetting:
+        case AdjustmentLayerKey.KnockoutSetting:
             return parseKnockoutSetting(ctx);
-        case SuportedAdjustmentLayerKey.ProtectedSetting:
+        case AdjustmentLayerKey.ProtectedSetting:
             return parseProtectedSetting(ctx);
-        case SuportedAdjustmentLayerKey.SheetColorSetting:
+        case AdjustmentLayerKey.SheetColorSetting:
             return parseSheetColorSetting(ctx);
-        case SuportedAdjustmentLayerKey.SectionDividerSetting:
+        case AdjustmentLayerKey.SectionDividerSetting:
             return parseSectionDividerSetting(ctx, dataSize);
     }
 }
 
 type AdjustmentLayerKeyMap = {
-    [SuportedAdjustmentLayerKey.Unsupported]: UnsupportedData;
-    [SuportedAdjustmentLayerKey.UnicodeLayerName]: UnicodeLayerName;
-    [SuportedAdjustmentLayerKey.LayerId]: LayerId;
-    [SuportedAdjustmentLayerKey.BlendClippingElements]: BlendClippingElements;
-    [SuportedAdjustmentLayerKey.BlendInteriorElements]: BlendInteriorElements;
-    [SuportedAdjustmentLayerKey.KnockoutSetting]: KnockoutSetting;
-    [SuportedAdjustmentLayerKey.ProtectedSetting]: ProtectedSetting;
-    [SuportedAdjustmentLayerKey.SheetColorSetting]: SheetColorSetting;
-    [SuportedAdjustmentLayerKey.SectionDividerSetting]: SectionDividerSetting;
+    [AdjustmentLayerKey.Unknown]: UnsupportedData;
+    [AdjustmentLayerKey.UnicodeLayerName]: UnicodeLayerName;
+    [AdjustmentLayerKey.LayerId]: LayerId;
+    [AdjustmentLayerKey.BlendClippingElements]: BlendClippingElements;
+    [AdjustmentLayerKey.BlendInteriorElements]: BlendInteriorElements;
+    [AdjustmentLayerKey.KnockoutSetting]: KnockoutSetting;
+    [AdjustmentLayerKey.ProtectedSetting]: ProtectedSetting;
+    [AdjustmentLayerKey.SheetColorSetting]: SheetColorSetting;
+    [AdjustmentLayerKey.SectionDividerSetting]: SectionDividerSetting;
 };
 
-export type AdditionalLayerData = AdjustmentLayerKeyMap[SuportedAdjustmentLayerKey];
+export type AdditionalLayerData = AdjustmentLayerKeyMap[AdjustmentLayerKey];
