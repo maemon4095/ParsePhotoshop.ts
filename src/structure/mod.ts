@@ -204,6 +204,7 @@ export type LayerProperties = {
     bottom: number;
     left: number;
     right: number;
+    /** 0 = transparent, 255 = opaque. */
     opacity: number;
     clippingMode: ClippingMode,
     blendMode: BlendMode;
