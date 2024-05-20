@@ -9,12 +9,9 @@ import { Determine } from "~/parse/AdditionalLayerInformation/helper.gen.ts";
 export default function parse(ctx: ParseContext, version: Version): AdditionalLayerInformation {
     void parseSigneture(ctx);
     const [key, rawKey] = parseKey(ctx);
-    console.log("additional info", String.fromCodePoint(...rawKey));
     const dataSize = parseDataSize(ctx, rawKey, version);
-    console.log("additional info size", dataSize);
     const start = ctx.byteOffset;
     const data = parseData(ctx, dataSize, key, version);
-    console.log("additional info: ", data);
     const consumed = ctx.byteOffset - start;
     ctx.advance(dataSize - consumed);
     return { ...data, rawKey };
