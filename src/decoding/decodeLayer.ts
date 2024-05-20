@@ -52,7 +52,7 @@ function decodeLayerRGB(file: PhotoshopFile, layer: LayerRecords, channels: Imag
             continue;
         }
         const segments = decodeImageChannel(file.fileHeader.version, layer, channels[ch]);
-        let pixelIndex = info.id < 0 ? 4 : info.id;
+        let pixelIndex = info.id < 0 ? 3 : info.id;
         for (const seg of segments) {
             const ctx = ParseContext.create(seg.buffer, seg.byteOffset);
             for (let x = 0; x < width; ++x) {
