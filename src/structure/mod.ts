@@ -1,5 +1,5 @@
 import { ParseOptions, PhotoshopFile } from "~/parse/mod.ts";
-import { LayerRecords } from "~/parse/LayerRecords.ts";
+import { ClippingMode, LayerRecords } from "~/parse/LayerRecords.ts";
 import { ImageChannel } from "~/parse/ImageChannel.ts";
 import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
 import { decode as decodeText } from "~/util/encoding/mod.ts";
@@ -167,9 +167,11 @@ function processRecord(file: PhotoshopFile, records: LayerRecords, channels: Ima
     const layerProps: Omit<LayerProperties, "parent"> = {
         name,
         imageData,
-        blendMode: records.blendMode,
         opacity: records.opacity,
+        blendMode: records.blendMode,
+        clippingMode: records.clippingMode,
         visible: (records.layerFlags & LayerFlags.Visible) === LayerFlags.Visible,
+        additionalInformations: records.additionalLayerInformations,
         ...records.enclosingRectangle,
     };
     if (dividerSettings === null || dividerSettings.type === SectionDividerType.Other) {
@@ -203,9 +205,11 @@ export type LayerProperties = {
     left: number;
     right: number;
     opacity: number;
+    clippingMode: ClippingMode,
     blendMode: BlendMode;
-    imageData: ImageData,
+    imageData: null | ImageData,
     parent: Group | PhotoshopStrucuture;
+    additionalInformations: AdditionalLayerInformation[];
 };
 
 export type Layer = {

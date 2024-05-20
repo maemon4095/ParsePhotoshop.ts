@@ -3,6 +3,7 @@ import { ImageDataCompression } from "~/parse/ImageCompression.ts";
 import { LayerRecords } from "~/parse/LayerRecords.ts";
 import { Version } from "~/parse/FileHeaderSection.ts";
 import { ImageChannel } from "~/parse/ImageChannel.ts";
+import { decompressRLE } from "~/Compression.ts";
 
 export type SegmentedChannelData = Iterable<Uint8Array>;
 
@@ -41,6 +42,6 @@ function* decodeImageChannelRLE(bin: Uint8Array, scanLineCount: number, version:
     for (let i = 0; i < lineSizes.length; ++i) {
         const scanLineSize = lineSizes[i];
         const scanline = ctx.takeUint8Array(scanLineSize);
-        yield scanline;
+        yield decompressRLE(scanline);
     }
 }

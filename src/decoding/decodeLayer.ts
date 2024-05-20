@@ -5,7 +5,7 @@ import { ImageChannel } from "~/structure/mod.ts";
 import { decodeImageChannel } from "~/decoding/channel.ts";
 import { ParseContext } from "~/util/parse/mod.ts";
 
-export function decodeLayer(file: PhotoshopFile, layer: LayerRecords, channels: ImageChannel[]): ImageData {
+export function decodeLayer(file: PhotoshopFile, layer: LayerRecords, channels: ImageChannel[]): null | ImageData {
     const colorMode = file.fileHeader.colorMode;
     switch (colorMode) {
         case ColorMode.RGB:
@@ -22,7 +22,7 @@ export function decodeLayer(file: PhotoshopFile, layer: LayerRecords, channels: 
     }
 }
 
-function decodeLayerRGB(file: PhotoshopFile, layer: LayerRecords, channels: ImageChannel[]): ImageData {
+function decodeLayerRGB(file: PhotoshopFile, layer: LayerRecords, channels: ImageChannel[]): null | ImageData {
     const colorDepth = file.fileHeader.colorDepth;
     if (colorDepth === 1) {
         throw new Error("Unsupported color format.");
@@ -38,18 +38,24 @@ function decodeLayerRGB(file: PhotoshopFile, layer: LayerRecords, channels: Imag
         }
     })();
 
-    const height = file.fileHeader.height;
-    const width = file.fileHeader.width;
+    const width = layer.enclosingRectangle.right - layer.enclosingRectangle.left;
+    const height = layer.enclosingRectangle.bottom - layer.enclosingRectangle.top;
+    if (width === 0 || height === 0) {
+        return null;
+    }
     const buffer = new Uint8ClampedArray(height * width * 4);
     buffer.fill(layer.opacity);
 
-    // R, G, B order
     for (let ch = 0; ch < channels.length; ++ch) {
+        const info = layer.channelInfos[ch];
+        if (info.id < -1) {
+            continue;
+        }
         const segments = decodeImageChannel(file.fileHeader.version, layer, channels[ch]);
-        let pixelIndex = ch;
+        let pixelIndex = info.id < 0 ? 4 : info.id;
         for (const seg of segments) {
             const ctx = ParseContext.create(seg.buffer, seg.byteOffset);
-            while (ctx.bytesLeft > 0) {
+            for (let x = 0; x < width; ++x) {
                 buffer[pixelIndex] = readChannel(ctx);
                 pixelIndex += 4;
             }
