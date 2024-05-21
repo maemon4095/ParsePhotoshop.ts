@@ -223,6 +223,8 @@ export type Group = {
     children: (Layer | Group)[];
 } & LayerProperties;
 
+export type PhotoshopNode = Layer | Group | PhotoshopStrucuture;
+
 export { Version, BlendMode, ColorMode };
 
 export type {
