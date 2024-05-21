@@ -29,7 +29,7 @@ export type PhotoshopStrucuture = {
     colorModeData: Uint8Array;
     imageResources: ImageResources;
     imageData: PhotoshopImageData | null;
-    roots: (Group | Layer)[];
+    children: (Group | Layer)[];
     /** all layers in top to bottom order. */
     layers: Layer[];
     additionalLayerInformations: AdditionalLayerInformation[];
@@ -58,7 +58,7 @@ export function constructPhotoshopStructureFrom(file: PhotoshopFile): PhotoshopS
     const blocks = file.imageResources.blocks;
     const layerRecords = file.layerAndMaskInformation.layerInfo?.layerRecords ?? [];
     const perLayerImages = file.layerAndMaskInformation.layerInfo?.perLayerChannels ?? [];
-    const { roots, layers } = collectRoots(file, layerRecords, perLayerImages);
+    const { roots: children, layers } = collectRoots(file, layerRecords, perLayerImages);
     const { additionalLayerInformations, globalLayerMaskInfo } = file.layerAndMaskInformation;
     const psd = {
         type: "Photoshop",
@@ -66,14 +66,14 @@ export function constructPhotoshopStructureFrom(file: PhotoshopFile): PhotoshopS
         colorModeData,
         imageData,
         imageResources: { blocks },
-        roots,
+        children,
         layers,
         additionalLayerInformations,
         globalLayerMaskInfo
     } as PhotoshopStrucuture;
 
-    for (let i = 0; i < roots.length; ++i) {
-        roots[i].parent = psd;
+    for (let i = 0; i < children.length; ++i) {
+        children[i].parent = psd;
     }
 
     return psd;
