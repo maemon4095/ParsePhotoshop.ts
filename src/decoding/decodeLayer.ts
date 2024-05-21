@@ -44,8 +44,6 @@ function decodeLayerRGB(file: PhotoshopFile, layer: LayerRecords, channels: Imag
         return null;
     }
     const buffer = new Uint8ClampedArray(height * width * 4);
-    buffer.fill(layer.opacity);
-
     for (let ch = 0; ch < channels.length; ++ch) {
         const info = layer.channelInfos[ch];
         if (info.id < -1) {
@@ -53,13 +51,24 @@ function decodeLayerRGB(file: PhotoshopFile, layer: LayerRecords, channels: Imag
         }
         const segments = decodeImageChannel(file.fileHeader.version, layer, channels[ch]);
         let pixelIndex = info.id < 0 ? 3 : info.id;
-        for (const seg of segments) {
-            const ctx = ParseContext.create(seg.buffer, seg.byteOffset);
-            for (let x = 0; x < width; ++x) {
-                buffer[pixelIndex] = readChannel(ctx);
-                pixelIndex += 4;
+        if (pixelIndex === 3) {
+            for (const seg of segments) {
+                const ctx = ParseContext.create(seg.buffer, seg.byteOffset);
+                while (ctx.bytesLeft > 0) {
+                    buffer[pixelIndex] = readChannel(ctx) * layer.opacity;
+                    pixelIndex += 4;
+                }
+            }
+        } else {
+            for (const seg of segments) {
+                const ctx = ParseContext.create(seg.buffer, seg.byteOffset);
+                while (ctx.bytesLeft > 0) {
+                    buffer[pixelIndex] = readChannel(ctx);
+                    pixelIndex += 4;
+                }
             }
         }
+
     }
 
     return new ImageData(buffer, width, height);
@@ -73,16 +82,14 @@ function decodeLayerIndexed(file: PhotoshopFile, layer: LayerRecords, channels: 
 
     // length always 768 = 256 * 3
     const palette = file.colorModeData.data;// non-interleaved order: RRR... GGG... BBB...
-
     const height = file.fileHeader.height;
     const width = file.fileHeader.width;
     const buffer = new Uint8ClampedArray(height * width * 4);
     buffer.fill(layer.opacity);
 
-    // R, G, B order
     for (let ch = 0; ch < channels.length; ++ch) {
         const segments = decodeImageChannel(file.fileHeader.version, layer, channels[ch]);
-        let pixelIndex = ch;
+        let pixelIndex: number = layer.channelInfos[ch].id;
         const paletteOffset = ch * 256;
         for (const seg of segments) {
             for (let i = 0; i < seg.length; ++i) {
