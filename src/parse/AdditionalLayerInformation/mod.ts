@@ -2,7 +2,7 @@ import { ParseContext } from "~/util/parse/mod.ts";
 import { SyntaxError } from "~/parse/SyntaxError.ts";
 import { _trie } from "$/tools/GenerateTrie/mod.ts";
 import { Version } from "~/parse/FileHeaderSection.ts";
-import parseData, { AdditionalLayerData } from "./parseData.ts";
+import parseData, { AdditionalLayerData } from "~/parse/AdditionalLayerInformation/parseData.ts";
 import { Determine } from "~/parse/AdditionalLayerInformation/helper.gen.ts";
 
 
@@ -10,10 +10,11 @@ export default function parse(ctx: ParseContext, version: Version): AdditionalLa
     void parseSigneture(ctx);
     const [key, rawKey] = parseKey(ctx);
     const dataSize = parseDataSize(ctx, rawKey, version);
+    const restSize = Math.ceil(dataSize / 2) * 2;
     const start = ctx.byteOffset;
     const data = parseData(ctx, dataSize, key, version);
     const consumed = ctx.byteOffset - start;
-    ctx.advance(dataSize - consumed);
+    ctx.advance(restSize - consumed);
     return { ...data, rawKey };
 }
 

@@ -34,7 +34,9 @@ export default function parse(ctx: ParseContext, version: Version): LayerAndMask
         const info = parseAdditionalLayerInfo(ctx, version);
         additionalLayerInformations.push(info);
         const consumed = ctx.byteOffset - start;
-        spaceLeft -= consumed;
+        const paddingSize = (Math.ceil(consumed / 4) * 4) - consumed;
+        ctx.advance(paddingSize);
+        spaceLeft -= consumed + paddingSize;
     }
     if (spaceLeft < 0) {
         throw new LayerAndMaskInformationSectionOverflowError(ctx.byteOffset);
