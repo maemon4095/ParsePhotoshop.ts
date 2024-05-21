@@ -30,7 +30,7 @@ export class Blender {
             this.#width = baseOrWidth.width;
             this.#height = baseOrWidth.height;
             this.#buffer = new Uint8ClampedArray(baseOrWidth.data);
-            this.#tmpBuffer = new Uint8ClampedArray(baseOrWidth.data);
+            this.#tmpBuffer = new Uint8ClampedArray(baseOrWidth.data.length);
         }
     }
 
@@ -55,11 +55,11 @@ export class Blender {
         const belowOffsetY = Math.max(dy, 0);
         const xMax = Math.min(image.width - aboveOffsetX, this.#width - belowOffsetX);
         const yMax = Math.min(image.height - aboveOffsetY, this.#height - belowOffsetY);
+        this.#tmpBuffer.set(this.#buffer);
         for (let y = 0; y < yMax; ++y) {
             for (let x = 0; x < xMax; ++x) {
                 const aboveOffset = ((y + aboveOffsetY) * image.width + (x + aboveOffsetX)) * 4;
                 const belowOffset = ((y + belowOffsetY) * this.#width + (x + belowOffsetX)) * 4;
-
                 const below = readPixel(this.#buffer, belowOffset);
                 const above = readPixel(image.data, aboveOffset);
                 const pixel = method(below, above);

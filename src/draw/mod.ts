@@ -1,29 +1,32 @@
 import { PhotoshopStrucuture } from "~/mod.ts";
-import { BlendMode } from "~/structure/mod.ts";
+import { BlendMode, Group, Layer } from "~/structure/mod.ts";
 import { Blender, ColorBlendMethod, ColorBlendMethods, CompositeMethods } from "./blender/mod.ts";
+import { ClippingMode } from "~/parse/LayerRecords.ts";
 
 export function createImageData(ps: PhotoshopStrucuture) {
     const layers = ps.layers;
     const blender = new Blender(ps.width, ps.height);
 
-    // clipping layerをどうするか。
+    // FIXME: クリッピングには直前のレイヤのみ影響すべき
+    // FIXME: クリッピングされるレイヤは、クリッピングレイヤが不可視のときは非表示になるべき
     for (let i = layers.length - 1; i >= 0; --i) {
         const layer = layers[i];
-        if (layer.visible) {
-            console.log("layer", layer.name, "is not visible.");
+        if (!isLayerVisible(layer) || layer.imageData === null) {
             continue;
         }
-        console.log("render layer", layer.name);
-        const compositeOperation = getBlendMethod(layer.blendMode);
-        if (compositeOperation === undefined) {
+        let blendMethod = getBlendMethod(layer.blendMode);
+        if (blendMethod === undefined) {
             console.warn("Unsupported blend mode was detected and treated as normal blend mode.");
+            blendMethod = ColorBlendMethods.normal;
         }
-        const method = compositeOperation ?? ColorBlendMethods.normal;
-        if (layer.imageData === null) {
-            continue;
-        }
+        const method = (() => {
+            if (layer.clippingMode === ClippingMode.NonBase) {
+                return CompositeMethods.sourceAtop(blendMethod);
+            }
+            return CompositeMethods.sourceOver(blendMethod);
+        })();
 
-        blender.blend(layer.imageData, layer.left, layer.top, CompositeMethods.sourceOver(method));
+        blender.blend(layer.imageData, layer.left, layer.top, method);
     }
 
     return blender.intoImageData();
@@ -69,4 +72,15 @@ function getBlendMethod(blendMode: BlendMode): undefined | ColorBlendMethod {
             return ColorBlendMethods.luminosity;
         default: return undefined;
     }
+}
+
+function isLayerVisible(layer: Layer): boolean {
+    let current: Layer | Group | PhotoshopStrucuture = layer;
+    while (current.type !== "Photoshop") {
+        if (!current.visible) {
+            return false;
+        }
+        current = current.parent;
+    }
+    return true;
 }
