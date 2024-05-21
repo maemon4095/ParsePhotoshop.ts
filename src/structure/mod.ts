@@ -170,7 +170,7 @@ function processRecord(file: PhotoshopFile, records: LayerRecords, channels: Ima
         opacity: records.opacity,
         blendMode: records.blendMode,
         clippingMode: records.clippingMode,
-        visible: (records.layerFlags & LayerFlags.Visible) === LayerFlags.Visible,
+        visible: (records.layerFlags & LayerFlags.Invisible) !== LayerFlags.Invisible,
         additionalInformations: records.additionalLayerInformations,
         ...records.enclosingRectangle,
     };
