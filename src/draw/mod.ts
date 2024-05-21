@@ -1,71 +1,72 @@
 import { PhotoshopStrucuture } from "~/mod.ts";
 import { BlendMode } from "~/structure/mod.ts";
-import { ClippingMode } from "~/parse/LayerRecords.ts";
+import { Blender, ColorBlendMethod, ColorBlendMethods, CompositeMethods } from "./blender/mod.ts";
 
 export function createImageData(ps: PhotoshopStrucuture) {
-    const offscreenCanvas = new OffscreenCanvas(ps.width, ps.height);
-    const context = offscreenCanvas.getContext("2d")!;
     const layers = ps.layers;
+    const blender = new Blender(ps.width, ps.height);
 
+    // clipping layerをどうするか。
     for (let i = layers.length - 1; i >= 0; --i) {
         const layer = layers[i];
+        if (layer.visible) {
+            console.log("layer", layer.name, "is not visible.");
+            continue;
+        }
         console.log("render layer", layer.name);
-        console.log("clipping base", layer.clippingMode == ClippingMode.Base);
-        const compositeOperation = getCompositionOption(layer.blendMode);
+        const compositeOperation = getBlendMethod(layer.blendMode);
         if (compositeOperation === undefined) {
             console.warn("Unsupported blend mode was detected and treated as normal blend mode.");
         }
-        console.log(compositeOperation);
-        context.globalCompositeOperation = compositeOperation ?? "source-over";
+        const method = compositeOperation ?? ColorBlendMethods.normal;
         if (layer.imageData === null) {
             continue;
         }
-        context.putImageData(layer.imageData, layer.left, layer.top);
+
+        blender.blend(layer.imageData, layer.left, layer.top, CompositeMethods.sourceOver(method));
     }
 
-    return context.getImageData(0, 0, ps.width, ps.height);
+    return blender.intoImageData();
 }
 
-function getCompositionOption(blendMode: BlendMode): undefined | GlobalCompositeOperation {
+function getBlendMethod(blendMode: BlendMode): undefined | ColorBlendMethod {
     switch (blendMode) {
         case BlendMode.Unknown:
             throw new Error("Unknown blend mode.");
         case BlendMode.PassThrough:
             throw new Error("Invalid blend mode.");
         case BlendMode.Normal:
-            return "source-over";
+            return ColorBlendMethods.normal;
         case BlendMode.Darken:
-            return "darken";
+            return ColorBlendMethods.darken;
         case BlendMode.Multiply:
-            return "multiply";
+            return ColorBlendMethods.multiply;
         case BlendMode.ColorBurn:
-            return "color-burn";
+            return ColorBlendMethods.colorBurn;
         case BlendMode.Lighten:
-            return "lighten";
+            return ColorBlendMethods.lighten;
         case BlendMode.Screen:
-            return "screen";
+            return ColorBlendMethods.screen;
         case BlendMode.ColorDodge:
-            return "color-dodge";
-        case BlendMode.LighterColor:
-            return "lighter";
+            return ColorBlendMethods.colorDodge;
         case BlendMode.Overlay:
-            return "overlay";
+            return ColorBlendMethods.overlay;
         case BlendMode.SoftLight:
-            return "soft-light";
+            return ColorBlendMethods.softLight;
         case BlendMode.HardLight:
-            return "hard-light";
+            return ColorBlendMethods.hardLight;
         case BlendMode.Exclusion:
-            return "exclusion";
-        case BlendMode.Subtract:
-            return "difference"; // NOTE: "difference" is not same method of BlendMode.Difference.
+            return ColorBlendMethods.exclusion;
+        case BlendMode.Difference:
+            return ColorBlendMethods.difference;
         case BlendMode.Hue:
-            return "hue";
+            return ColorBlendMethods.hue;
         case BlendMode.Saturation:
-            return "saturation";
+            return ColorBlendMethods.saturation;
         case BlendMode.Color:
-            return "color";
+            return ColorBlendMethods.color;
         case BlendMode.Luminosity:
-            return "luminosity";
+            return ColorBlendMethods.luminosity;
         default: return undefined;
     }
 }
