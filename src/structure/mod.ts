@@ -92,7 +92,7 @@ function collectRoots(file: PhotoshopFile, layerRecords: LayerRecords[], perLaye
     roots: (Optional<Group, "parent"> | Optional<Layer, "parent">)[];
     layers: Layer[];
 } {
-    // layer は最も背面から並んでいる。
+    // layer は最も背面から並んでいるため、最上面からに並び替え。
     layerRecords = layerRecords.toReversed();
     perLayerChannels = perLayerChannels.toReversed();
     const layers: Layer[] = [];
