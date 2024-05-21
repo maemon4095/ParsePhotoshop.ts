@@ -166,7 +166,7 @@ export enum ClippingMode {
 
 export enum LayerFlags {
     TransparencyProtected = 1 << 0,
-    Visible = 1 << 1,
+    Invisible = 1 << 1,
     Obsolete = 1 << 2,
     PhotoshopVersionLater5 = 1 << 3,
     PixelDataIrrelevant = 1 << 4,
