@@ -1,7 +1,7 @@
 import ts from "npm:typescript";
 import * as fs from "https://deno.land/std@0.224.0/fs/mod.ts";
-import { transform, SourceGenerator } from "./tools/SourceGenerator/mod.ts";
-import { TrieGenerator } from "./tools/GenerateTrie/mod.ts";
+import { transform, SourceGenerator } from "https://raw.githubusercontent.com/maemon4095/SourceGenerator.ts/main/mod.ts";
+import { TrieGenerator } from "$/tools/GenerateTrie/mod.ts";
 
 const mode = Deno.args[0];
 
