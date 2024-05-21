@@ -50,7 +50,7 @@ export function parse(buffer: ArrayBuffer, options?: ParseOptions): PhotoshopStr
     const file = parsePhotoshop(buffer, options);
     return constructPhotoshopStructureFrom(file);
 }
-
+// FIXME: クリッピングを構造に反映する。
 export function constructPhotoshopStructureFrom(file: PhotoshopFile): PhotoshopStrucuture {
     const colorModeData = file.colorModeData.data;
     const { height, width, channelCount, colorDepth, colorMode, version } = file.fileHeader;
