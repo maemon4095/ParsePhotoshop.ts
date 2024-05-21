@@ -104,7 +104,7 @@ function collectRoots(file: PhotoshopFile, layerRecords: LayerRecords[], perLaye
 
         if (node === END_OF_GROUP) {
             const group = groupStack.pop()!;
-            const parent = groupStack[0];
+            const parent = groupStack[groupStack.length - 1];
             if (parent === undefined) {
                 roots.push(group);
             } else {
