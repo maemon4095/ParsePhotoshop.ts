@@ -3,7 +3,7 @@ import { ImageDataSection } from "~/parse/ImageDataSection.ts";
 import { PhotoshopFile } from "~/parse/mod.ts";
 import { decompressRLE } from "~/Compression.ts";
 import { ColorMode, FileHeaderSection } from "~/parse/FileHeaderSection.ts";
-import { ImageDataCompression } from "../parse/ImageCompression.ts";
+import { ImageDataCompression } from "~/parse/ImageCompression.ts";
 
 export function decodeImageDataSection(file: PhotoshopFile) {
     if (file.imageDataSection === null) {

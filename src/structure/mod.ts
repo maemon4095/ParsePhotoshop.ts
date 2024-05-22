@@ -13,10 +13,6 @@ import { BlendMode } from "~/parse/BlendMode.gen.ts";
 import parsePhotoshop from "~/parse/mod.ts";
 import { ImageDataCompression } from "~/parse/ImageCompression.ts";
 import { decodeLayer } from "~/decoding/mod.ts";
-export type { Rectangle } from "~/parse/Rectangle.ts";
-export type { ClippingMode } from "~/parse/LayerRecords.ts";
-export type { LayerBlendingRanges } from "~/parse/LayerBlendingRanges.ts";
-
 
 export type PhotoshopStrucuture = {
     type: "Photoshop",
@@ -224,15 +220,3 @@ export type Group = {
 } & LayerProperties;
 
 export type PhotoshopNode = Layer | Group | PhotoshopStrucuture;
-
-export { Version, BlendMode, ColorMode };
-
-export type {
-    ImageChannel,
-    AdjustmentLayerKey,
-    ImageDataCompression, ImageResourceBlock,
-    ColorDepth,
-    AdditionalLayerInformation,
-    ParseOptions
-};
-

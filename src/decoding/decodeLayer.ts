@@ -1,7 +1,7 @@
 import { PhotoshopFile } from "~/parse/mod.ts";
-import { ColorMode } from "../parse/FileHeaderSection.ts";
+import { ColorMode } from "~/parse/FileHeaderSection.ts";
 import { LayerRecords } from "~/parse/LayerRecords.ts";
-import { ImageChannel } from "~/structure/mod.ts";
+import { ImageChannel } from "~/parse/ImageChannel.ts";
 import { decodeImageChannel } from "~/decoding/channel.ts";
 import { ParseContext } from "~/util/parse/mod.ts";
 
