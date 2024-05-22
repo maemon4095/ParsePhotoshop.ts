@@ -19,10 +19,7 @@ export { type LayerMask } from "./LayerMask.ts";
 export { type LayerRecords, type ChannelInfo, ChannelId, ClippingMode, LayerFlags } from "./LayerRecords.ts";
 export { type Rectangle } from "./Rectangle.ts";
 export { SyntaxError as PhotoshopSyntaxError } from "./SyntaxError.ts";
-export { type FileHeaderSection };
-export { type ColorModeDataSection };
-export { type ImageResourcesSection };
-export { type LayerAndMaskInformationSection };
+export type { FileHeaderSection, ColorModeDataSection, ImageResourcesSection, LayerAndMaskInformationSection, ImageDataSection };
 
 export default function parse(buffer: ArrayBuffer, options?: ParseOptions): PhotoshopFile {
     const ctx = new ParseContext(new DataView(buffer), 0);
