@@ -2,9 +2,5 @@
   "tasks": {
     "build": "deno run -A build.ts build",
     "watch": "deno run -A build.ts watch"
-  },
-  "imports": {
-    "~/": "./src/",
-    "$/": "./"
   }
 }

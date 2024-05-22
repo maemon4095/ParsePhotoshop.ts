@@ -1,6 +1,6 @@
 import { ParseContext, measured } from "../util/parse/mod.ts";
 import { ChannelInfo } from "./LayerRecords.ts";
-import parseImageDataCompression, { ImageDataCompression } from "~/parse/ImageCompression.ts";
+import parseImageDataCompression, { ImageDataCompression } from "./ImageCompression.ts";
 
 export default function parse(ctx: ParseContext, channelInfo: ChannelInfo): ImageChannel {
     const [compression, consumed] = measured(parseImageDataCompression)(ctx);

@@ -1,7 +1,7 @@
 import ts from "npm:typescript";
 import { SourceGenerator } from "https://raw.githubusercontent.com/maemon4095/SourceGenerator.ts/main/mod.ts";
 import { createMarkerDecorator } from "https://raw.githubusercontent.com/maemon4095/SourceGenerator.ts/main/util.ts";
-import { generateFunction } from "$/tools/GenerateTrie/generator.ts";
+import { generateFunction } from "./generator.ts";
 
 export const _trie = createMarkerDecorator();
 

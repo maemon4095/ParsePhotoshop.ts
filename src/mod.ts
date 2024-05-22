@@ -1,3 +1,3 @@
-import parsePhotoshopFile from "~/parse/mod.ts";
-import { parse, constructPhotoshopStructureFrom, PhotoshopStrucuture } from "~/structure/mod.ts";
-export { parsePhotoshopFile, parse, constructPhotoshopStructureFrom, type PhotoshopStrucuture };
+import parsePhotoshopFile from "./parse/mod.ts";
+export { parsePhotoshopFile };
+export * from "./structure/mod.ts";

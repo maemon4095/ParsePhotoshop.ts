@@ -1,4 +1,4 @@
-import { PriorityQueue } from "~/util/collections/mod.ts";
+import { PriorityQueue } from "../collections/mod.ts";
 
 const encodingCandidates = [
     "utf-8",
