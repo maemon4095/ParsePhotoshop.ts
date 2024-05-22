@@ -7,7 +7,7 @@ import parseLayerAndMaskInformation, { LayerAndMaskInformationSection } from "./
 import parseImageDataSection, { ImageDataSection } from "./ImageDataSection.ts";
 
 export { type AdditionalLayerInformation, AdjustmentLayerKey } from "./AdditionalLayerInformation/mod.ts";
-export { type BlendMode } from "./BlendMode.gen.ts";
+export { BlendMode } from "./BlendMode.gen.ts";
 export { type ColorDepth, Version, ColorMode } from "./FileHeaderSection.ts";
 export { type GlobalLayerMaskInfo } from "./GlobalLayerMaskInfo.ts";
 export { type ImageChannel } from "./ImageChannel.ts";
