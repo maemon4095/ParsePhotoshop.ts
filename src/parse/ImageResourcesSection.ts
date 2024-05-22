@@ -1,6 +1,6 @@
-import { ParseContext, measured } from "~/util/parse/mod.ts";
-import parseBlock, { ImageResourceBlock } from "~/parse/ImageResourceBlock.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
+import { ParseContext, measured } from "../util/parse/mod.ts";
+import parseBlock, { ImageResourceBlock } from "./ImageResourceBlock.ts";
+import { SyntaxError } from "./SyntaxError.ts";
 
 export default function parse(ctx: ParseContext): ImageResourcesSection {
     let rest = ctx.takeUint32();

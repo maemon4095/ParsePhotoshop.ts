@@ -1,5 +1,5 @@
-import { ParseContext } from "~/util/parse/mod.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
+import { ParseContext } from "../util/parse/mod.ts";
+import { SyntaxError } from "./SyntaxError.ts";
 
 export default function parse(ctx: ParseContext): ImageDataCompression {
     const compression = ctx.peekUint16();

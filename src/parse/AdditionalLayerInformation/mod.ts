@@ -1,10 +1,9 @@
-import { ParseContext } from "~/util/parse/mod.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
-import { _trie } from "$/tools/GenerateTrie/mod.ts";
-import { Version } from "~/parse/FileHeaderSection.ts";
-import parseData, { AdditionalLayerData } from "~/parse/AdditionalLayerInformation/parseData.ts";
-import { Determine } from "~/parse/AdditionalLayerInformation/helper.gen.ts";
-
+import { ParseContext } from "../../util/parse/mod.ts";
+import { SyntaxError } from "../SyntaxError.ts";
+import { _trie } from "../../../tools/GenerateTrie/mod.ts";
+import { Version } from "../FileHeaderSection.ts";
+import parseData, { AdditionalLayerData } from "./parseData.ts";
+import { Determine } from "./helper.gen.ts";
 
 export default function parse(ctx: ParseContext, version: Version): AdditionalLayerInformation {
     void parseSigneture(ctx);

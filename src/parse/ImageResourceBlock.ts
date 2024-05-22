@@ -1,6 +1,6 @@
-import { ParseContext, aligned } from "~/util/parse/mod.ts";
-import parsePascalString from "~/parse/PascalString.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
+import { ParseContext, aligned } from "../util/parse/mod.ts";
+import parsePascalString from "./PascalString.ts";
+import { SyntaxError } from "./SyntaxError.ts";
 
 export default function parse(ctx: ParseContext): ImageResourceBlock {
     void parseBlockSigneture(ctx);

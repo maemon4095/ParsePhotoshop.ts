@@ -1,5 +1,5 @@
-import { _trie } from "$/tools/GenerateTrie/mod.ts";
-import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
+import { _trie } from "../../../tools/GenerateTrie/mod.ts";
+import { AdjustmentLayerKey } from "./mod.ts";
 
 export enum Signeture {
     _8BIM,

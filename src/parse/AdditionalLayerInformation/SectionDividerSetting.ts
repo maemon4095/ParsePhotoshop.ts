@@ -1,8 +1,8 @@
-import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
-import { ParseContext } from "~/util/parse/mod.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
-import { Determine, Signeture } from "~/parse/AdditionalLayerInformation/helper.gen.ts";
-import parseBlendMode, { BlendMode } from "~/parse/BlendMode.gen.ts";
+import { AdjustmentLayerKey } from "./mod.ts";
+import { ParseContext } from "../../util/parse/mod.ts";
+import { SyntaxError } from "../SyntaxError.ts";
+import { Determine, Signeture } from "./helper.gen.ts";
+import parseBlendMode, { BlendMode } from "../BlendMode.gen.ts";
 
 export default function parse(ctx: ParseContext, dataLength: number): SectionDividerSetting {
     const data = parseCore(ctx, dataLength);

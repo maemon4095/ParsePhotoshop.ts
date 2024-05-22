@@ -1,6 +1,6 @@
-import { ParseContext } from "~/util/parse/mod.ts";
-import { _trie } from "$/tools/GenerateTrie/mod.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
+import { ParseContext } from "../util/parse/mod.ts";
+import { _trie } from "../../tools/GenerateTrie/mod.ts";
+import { SyntaxError } from "./SyntaxError.ts";
 
 export default function parse(ctx: ParseContext): [BlendMode, Uint8Array] {
     const bin = ctx.takeUint8Array(4);

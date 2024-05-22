@@ -1,6 +1,6 @@
-import { ParseContext } from "~/util/parse/mod.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
-import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
+import { ParseContext } from "../..//util/parse/mod.ts";
+import { SyntaxError } from "../SyntaxError.ts";
+import { AdjustmentLayerKey } from "./mod.ts";
 
 export default function parse(ctx: ParseContext): LayerId {
     ctx.takeUint32();

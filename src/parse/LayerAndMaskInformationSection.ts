@@ -1,9 +1,9 @@
-import { ParseContext } from "~/util/parse/mod.ts";
-import { Version } from "~/parse/FileHeaderSection.ts";
-import parseLayerInfo, { LayerInfo } from "~/parse/LayerInfo.ts";
-import parseGlobalLayerMaskInfo, { GlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
-import parseAdditionalLayerInfo, { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation/mod.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
+import { ParseContext } from "../util/parse/mod.ts";
+import { Version } from "./FileHeaderSection.ts";
+import parseLayerInfo, { LayerInfo } from "./LayerInfo.ts";
+import parseGlobalLayerMaskInfo, { GlobalLayerMaskInfo } from "./GlobalLayerMaskInfo.ts";
+import parseAdditionalLayerInfo, { AdditionalLayerInformation } from "./AdditionalLayerInformation/mod.ts";
+import { SyntaxError } from "./SyntaxError.ts";
 
 export default function parse(ctx: ParseContext, version: Version): LayerAndMaskInformationSection {
     const sectionLength = (() => {

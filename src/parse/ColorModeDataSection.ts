@@ -1,6 +1,6 @@
-import { ColorMode } from "~/parse/FileHeaderSection.ts";
-import { ParseContext } from "~/util/parse/mod.ts";
-import { SyntaxError } from "~/parse/SyntaxError.ts";
+import { ColorMode } from "./FileHeaderSection.ts";
+import { ParseContext } from "../util/parse/mod.ts";
+import { SyntaxError } from "./SyntaxError.ts";
 
 export default function parse(ctx: ParseContext, colorMode: ColorMode): ColorModeDataSection {
     const length = ctx.peekUint32();

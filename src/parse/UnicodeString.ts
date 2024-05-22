@@ -1,4 +1,4 @@
-import { ParseContext } from "~/util/parse/mod.ts";
+import { ParseContext } from "../util/parse/mod.ts";
 
 /** Parse unicode string in Photoshop file. (UTF-16)*/
 export default function parse(ctx: ParseContext) {

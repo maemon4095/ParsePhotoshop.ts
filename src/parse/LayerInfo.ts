@@ -1,7 +1,7 @@
-import { ParseContext } from "~/util/parse/mod.ts";
-import { Version } from "~/parse/FileHeaderSection.ts";
-import parseLayerRecord, { LayerRecords } from "~/parse/LayerRecords.ts";
-import parseImageChannel, { ImageChannel } from "~/parse/ImageChannel.ts";
+import { ParseContext } from "../util/parse/mod.ts";
+import { Version } from "./FileHeaderSection.ts";
+import parseLayerRecord, { LayerRecords } from "./LayerRecords.ts";
+import parseImageChannel, { ImageChannel } from "./ImageChannel.ts";
 
 export default function parse(ctx: ParseContext, version: Version): LayerInfo | null {
     const sectionLength = (() => {
