@@ -1,53 +1,30 @@
-import { ParseOptions, PhotoshopFile } from "~/parse/mod.ts";
-import { ClippingMode, LayerRecords } from "~/parse/LayerRecords.ts";
-import { ImageChannel } from "~/parse/ImageChannel.ts";
-import { AdjustmentLayerKey } from "~/parse/AdditionalLayerInformation/mod.ts";
-import { decode as decodeText } from "~/util/encoding/mod.ts";
-import { SectionDividerSetting, SectionDividerType } from "~/parse/AdditionalLayerInformation/SectionDividerSetting.ts";
-import { ImageResourceBlock } from "~/parse/ImageResourceBlock.ts";
-import { ColorDepth, ColorMode, Version } from "~/parse/FileHeaderSection.ts";
-import { AdditionalLayerInformation } from "~/parse/AdditionalLayerInformation/mod.ts";
-import { GlobalLayerMaskInfo } from "~/parse/GlobalLayerMaskInfo.ts";
-import { LayerFlags } from "~/parse/LayerRecords.ts";
-import { BlendMode } from "~/parse/BlendMode.gen.ts";
-import parsePhotoshop from "~/parse/mod.ts";
-import { ImageDataCompression } from "~/parse/ImageCompression.ts";
-import { decodeLayer } from "~/decoding/mod.ts";
+import { decode as decodeText } from "../util/encoding/mod.ts";
+import {
+    AdjustmentLayerKey, ParseOptions, PhotoshopFile, ClippingMode,
+    LayerRecords, ImageChannel, ImageResourceBlock, ColorDepth,
+    ColorMode, Version, AdditionalLayerInformation, GlobalLayerMaskInfo,
+    LayerFlags, BlendMode, ImageDataCompression, default as parsePhotoshop
+} from "../parse/mod.ts";
+import { SectionDividerSetting, SectionDividerType } from "../parse/AdditionalLayerInformation/SectionDividerSetting.ts";
+import { decodeLayer } from "../decoding/mod.ts";
 
-export type PhotoshopStrucuture = {
-    type: "Photoshop",
-    height: number;
-    width: number;
-    channelCount: number;
-    colorDepth: ColorDepth;
-    colorMode: ColorMode;
-    version: Version;
-    colorModeData: Uint8Array;
-    imageResources: ImageResources;
-    imageData: PhotoshopImageData | null;
-    children: (Group | Layer)[];
-    /** all layers in top to bottom order. */
-    layers: Layer[];
-    additionalLayerInformations: AdditionalLayerInformation[];
-    globalLayerMaskInfo: GlobalLayerMaskInfo | null;
+export type {
+    AdditionalLayerInformation, ImageResourceBlock,
+    ColorDepth, GlobalLayerMaskInfo,
 };
 
-export type PhotoshopImageData = {
-    compression: ImageDataCompression;
-    data: Uint8Array;
-};
-export type ImageResources = {
-    blocks: ImageResourceBlock[];
+export {
+    BlendMode, ImageDataCompression, ClippingMode, Version, ColorMode,
 };
 
 const END_OF_GROUP = Symbol();
 
-export function parse(buffer: ArrayBuffer, options?: ParseOptions): PhotoshopStrucuture {
+export function parse(buffer: ArrayBuffer, options?: ParseOptions): Photoshop {
     const file = parsePhotoshop(buffer, options);
     return constructPhotoshopStructureFrom(file);
 }
 // FIXME: クリッピングを構造に反映する。
-export function constructPhotoshopStructureFrom(file: PhotoshopFile): PhotoshopStrucuture {
+export function constructPhotoshopStructureFrom(file: PhotoshopFile): Photoshop {
     const colorModeData = file.colorModeData.data;
     const { height, width, channelCount, colorDepth, colorMode, version } = file.fileHeader;
     const imageData: PhotoshopImageData | null = file.imageDataSection;
@@ -66,7 +43,7 @@ export function constructPhotoshopStructureFrom(file: PhotoshopFile): PhotoshopS
         layers,
         additionalLayerInformations,
         globalLayerMaskInfo
-    } as PhotoshopStrucuture;
+    } as Photoshop;
 
     for (let i = 0; i < children.length; ++i) {
         children[i].parent = psd;
@@ -75,7 +52,7 @@ export function constructPhotoshopStructureFrom(file: PhotoshopFile): PhotoshopS
     return psd;
 }
 
-export function getPhotoshop(node: Layer | Group | PhotoshopStrucuture): PhotoshopStrucuture {
+export function getPhotoshop(node: Layer | Group | Photoshop): Photoshop {
     while (node.type !== "Photoshop") {
         node = node.parent;
     }
@@ -193,6 +170,33 @@ function processRecord(file: PhotoshopFile, records: LayerRecords, channels: Ima
     };
 }
 
+export type Photoshop = {
+    type: "Photoshop",
+    height: number;
+    width: number;
+    channelCount: number;
+    colorDepth: ColorDepth;
+    colorMode: ColorMode;
+    version: Version;
+    colorModeData: Uint8Array;
+    imageResources: ImageResources;
+    imageData: PhotoshopImageData | null;
+    children: (Group | Layer)[];
+    /** all layers in top to bottom order. */
+    layers: Layer[];
+    additionalLayerInformations: AdditionalLayerInformation[];
+    globalLayerMaskInfo: GlobalLayerMaskInfo | null;
+};
+
+export type PhotoshopImageData = {
+    compression: ImageDataCompression;
+    data: Uint8Array;
+};
+
+export type ImageResources = {
+    blocks: ImageResourceBlock[];
+};
+
 export type LayerProperties = {
     name: string;
     visible: boolean;
@@ -205,7 +209,7 @@ export type LayerProperties = {
     clippingMode: ClippingMode,
     blendMode: BlendMode;
     imageData: null | ImageData,
-    parent: Group | PhotoshopStrucuture;
+    parent: Group | Photoshop;
     additionalInformations: AdditionalLayerInformation[];
 };
 
@@ -219,4 +223,4 @@ export type Group = {
     children: (Layer | Group)[];
 } & LayerProperties;
 
-export type PhotoshopNode = Layer | Group | PhotoshopStrucuture;
+export type PhotoshopNode = Layer | Group | Photoshop;
