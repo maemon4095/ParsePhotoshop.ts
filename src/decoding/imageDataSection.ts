@@ -1,11 +1,8 @@
-import { ParseContext } from "~/util/parse/mod.ts";
-import { ImageDataSection } from "~/parse/ImageDataSection.ts";
-import { PhotoshopFile } from "~/parse/mod.ts";
-import { decompressRLE } from "~/Compression.ts";
-import { ColorMode, FileHeaderSection } from "~/parse/FileHeaderSection.ts";
-import { ImageDataCompression } from "~/parse/ImageCompression.ts";
+import { ParseContext } from "../util/parse/mod.ts";
+import { ImageDataSection, PhotoshopFile, ColorMode, FileHeaderSection, ImageDataCompression } from "../parse/mod.ts";
+import { decompressRLE } from "../Compression.ts";
 
-export function decodeImageDataSection(file: PhotoshopFile) {
+export function decodeImageDataSection(file: PhotoshopFile): ImageData {
     if (file.imageDataSection === null) {
         throw new Error("image data section is null.");
     }
@@ -33,7 +30,7 @@ export function decodeImageDataSection(file: PhotoshopFile) {
     }
 }
 
-function decodeImageDataSectionRaw(imageDataSection: ImageDataSection, fileHeader: FileHeaderSection) {
+function decodeImageDataSectionRaw(imageDataSection: ImageDataSection, fileHeader: FileHeaderSection): ImageData {
     const bin = imageDataSection.data;
     const imageData = new Uint8ClampedArray(fileHeader.width * fileHeader.height * 4);
     const channelCount = Math.min(fileHeader.channelCount, 4);
@@ -53,7 +50,7 @@ function decodeImageDataSectionRaw(imageDataSection: ImageDataSection, fileHeade
     return new ImageData(imageData, fileHeader.width, fileHeader.height);;
 }
 
-function decodeImageDataSectionRawIndexed(file: PhotoshopFile) {
+function decodeImageDataSectionRawIndexed(file: PhotoshopFile): ImageData {
     const { imageDataSection, fileHeader, colorModeData } = file;
     // length always 768 = 256 * 3
     const table = colorModeData.data; // non-interleaved order: RRR... GGG... BBB...
@@ -74,7 +71,7 @@ function decodeImageDataSectionRawIndexed(file: PhotoshopFile) {
 
     return new ImageData(imageData, fileHeader.width, fileHeader.height);
 }
-function decodeImageDataSectionRLE(imageDataSection: ImageDataSection, fileHeader: FileHeaderSection) {
+function decodeImageDataSectionRLE(imageDataSection: ImageDataSection, fileHeader: FileHeaderSection): ImageData {
     // FIXME: non 8 bit color support
     const bin = imageDataSection.data;
     const ctx = ParseContext.create(bin.buffer, bin.byteOffset);
