@@ -1,9 +1,7 @@
-import { PhotoshopStrucuture } from "~/mod.ts";
-import { BlendMode, Group, Layer } from "~/structure/mod.ts";
-import { Blender, ColorBlendMethod, ColorBlendMethods, CompositeMethods } from "./blender/mod.ts";
-import { ClippingMode } from "~/parse/LayerRecords.ts";
+import { Photoshop, BlendMode, Group, Layer, ClippingMode } from "../structure/mod.ts";
+import { Blender, ColorBlendMethod, ColorBlendMethods, CompositeMethods } from "jsr:@maemon4095/imagedata-blender";
 
-export function createImageData(ps: PhotoshopStrucuture) {
+export function render(ps: Photoshop): ImageData {
     const layers = ps.layers;
     const blender = new Blender(ps.width, ps.height);
 
@@ -75,7 +73,7 @@ function getBlendMethod(blendMode: BlendMode): undefined | ColorBlendMethod {
 }
 
 function isLayerVisible(layer: Layer): boolean {
-    let current: Layer | Group | PhotoshopStrucuture = layer;
+    let current: Layer | Group | Photoshop = layer;
     while (current.type !== "Photoshop") {
         if (!current.visible) {
             return false;
