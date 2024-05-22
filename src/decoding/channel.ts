@@ -1,6 +1,6 @@
 import { ParseContext } from "../util/parse/mod.ts";
 import { ImageDataCompression, LayerRecords, Version, ImageChannel } from "../parse/mod.ts";
-import { decompressRLE } from "../Compression.ts";
+import { decompressRLE } from "../compression/mod.ts";
 
 export type SegmentedChannelData = Iterable<Uint8Array>;
 

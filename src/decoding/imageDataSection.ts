@@ -1,6 +1,6 @@
 import { ParseContext } from "../util/parse/mod.ts";
 import { ImageDataSection, PhotoshopFile, ColorMode, FileHeaderSection, ImageDataCompression } from "../parse/mod.ts";
-import { decompressRLE } from "../Compression.ts";
+import { decompressRLE } from "../compression/mod.ts";
 
 export function decodeImageDataSection(file: PhotoshopFile): ImageData {
     if (file.imageDataSection === null) {
