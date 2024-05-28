@@ -1,5 +1,5 @@
 /** @see {@link https://www.fileformat.info/format/tiff/corion-packbits.htm} */
-export function decompressRLE(bin: Uint8Array): Uint8Array { // ここに非常に時間がかかっている模様。
+export function decompressRLE(bin: Uint8Array): Uint8Array {
     const totalLen = getTotalLength(bin);
     const buf = new Uint8Array(totalLen);
     let written = 0;
