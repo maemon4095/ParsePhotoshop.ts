@@ -41,9 +41,7 @@ export class ParseContext {
 
     peekUint8Into(buf: Uint8Array) {
         const offset = this.#byteOffset;
-        for (let i = 0; i < buf.length; ++i) {
-            buf[i] = this.#view.getUint8(offset + i);
-        }
+        buf.set(new Uint8Array(this.#view.buffer, offset, buf.length));
     }
 
     peekUint8Array(length: number): Uint8Array {
