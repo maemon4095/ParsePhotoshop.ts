@@ -1,10 +1,8 @@
 import { Photoshop, BlendMode, Group, Layer, ClippingMode } from "../structure/mod.ts";
 import { Blender, BlendShader, CompositeMethod } from "jsr:@maemon4095/imagedata-blender-gl";
 
-export function render(ps: Photoshop): ImageData {
+export function blendTo(blender: Blender, ps: Photoshop, dx: number, dy: number) {
     const layers = ps.layers;
-    const blender = new Blender(ps.width, ps.height);
-
     // FIXME: クリッピングには直前のレイヤのみ影響すべき
     // FIXME: クリッピングされるレイヤは、クリッピングレイヤが不可視のときは非表示になるべき
     for (let i = layers.length - 1; i >= 0; --i) {
@@ -20,9 +18,13 @@ export function render(ps: Photoshop): ImageData {
         if (layer.clippingMode === ClippingMode.NonBase) {
             blendShader = blendShader.withCompositeMethod(CompositeMethod.sourceAtop);
         }
-        blender.blend(layer.imageData, layer.left, layer.top, blendShader);
+        blender.blend(layer.imageData, layer.left + dx, layer.top + dy, blendShader);
     }
+}
 
+export function render(ps: Photoshop): ImageData {
+    const blender = new Blender(ps.width, ps.height);
+    blendTo(blender, ps, 0, 0);
     return blender.createImageData();
 }
 
