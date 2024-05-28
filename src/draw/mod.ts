@@ -1,5 +1,5 @@
 import { Photoshop, BlendMode, Group, Layer, ClippingMode } from "../structure/mod.ts";
-import { Blender, ColorBlendMethod, ColorBlendMethods, CompositeMethods } from "jsr:@maemon4095/imagedata-blender";
+import { Blender, BlendShader, CompositeMethod } from "jsr:@maemon4095/imagedata-blender-gl";
 
 export function render(ps: Photoshop): ImageData {
     const layers = ps.layers;
@@ -12,62 +12,58 @@ export function render(ps: Photoshop): ImageData {
         if (!isLayerVisible(layer) || layer.imageData === null) {
             continue;
         }
-        let blendMethod = getBlendMethod(layer.blendMode);
-        if (blendMethod === undefined) {
+        let blendShader = getBlendShader(layer.blendMode);
+        if (blendShader === undefined) {
             console.warn("Unsupported blend mode was detected and treated as normal blend mode.");
-            blendMethod = ColorBlendMethods.normal;
+            blendShader = BlendShader.normal;
         }
-        const method = (() => {
-            if (layer.clippingMode === ClippingMode.NonBase) {
-                return CompositeMethods.sourceAtop(blendMethod);
-            }
-            return CompositeMethods.sourceOver(blendMethod);
-        })();
-
-        blender.blend(layer.imageData, layer.left, layer.top, method);
+        if (layer.clippingMode === ClippingMode.NonBase) {
+            blendShader = blendShader.withCompositeMethod(CompositeMethod.sourceAtop);
+        }
+        blender.blend(layer.imageData, layer.left, layer.top, blendShader);
     }
 
-    return blender.intoImageData();
+    return blender.createImageData();
 }
 
-function getBlendMethod(blendMode: BlendMode): undefined | ColorBlendMethod {
+function getBlendShader(blendMode: BlendMode): undefined | BlendShader {
     switch (blendMode) {
         case BlendMode.Unknown:
             throw new Error("Unknown blend mode.");
         case BlendMode.PassThrough:
             throw new Error("Invalid blend mode.");
         case BlendMode.Normal:
-            return ColorBlendMethods.normal;
+            return BlendShader.normal;
         case BlendMode.Darken:
-            return ColorBlendMethods.darken;
+            return BlendShader.darken;
         case BlendMode.Multiply:
-            return ColorBlendMethods.multiply;
+            return BlendShader.multiply;
         case BlendMode.ColorBurn:
-            return ColorBlendMethods.colorBurn;
+            return BlendShader.colorBurn;
         case BlendMode.Lighten:
-            return ColorBlendMethods.lighten;
+            return BlendShader.lighten;
         case BlendMode.Screen:
-            return ColorBlendMethods.screen;
+            return BlendShader.screen;
         case BlendMode.ColorDodge:
-            return ColorBlendMethods.colorDodge;
+            return BlendShader.colorDodge;
         case BlendMode.Overlay:
-            return ColorBlendMethods.overlay;
+            return BlendShader.overlay;
         case BlendMode.SoftLight:
-            return ColorBlendMethods.softLight;
+            return BlendShader.softLight;
         case BlendMode.HardLight:
-            return ColorBlendMethods.hardLight;
+            return BlendShader.hardLight;
         case BlendMode.Exclusion:
-            return ColorBlendMethods.exclusion;
+            return BlendShader.exclusion;
         case BlendMode.Difference:
-            return ColorBlendMethods.difference;
+            return BlendShader.difference;
         case BlendMode.Hue:
-            return ColorBlendMethods.hue;
+            return BlendShader.hue;
         case BlendMode.Saturation:
-            return ColorBlendMethods.saturation;
+            return BlendShader.saturation;
         case BlendMode.Color:
-            return ColorBlendMethods.color;
+            return BlendShader.color;
         case BlendMode.Luminosity:
-            return ColorBlendMethods.luminosity;
+            return BlendShader.luminosity;
         default: return undefined;
     }
 }
