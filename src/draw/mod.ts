@@ -1,5 +1,5 @@
 import { Photoshop, BlendMode, Group, Layer, ClippingMode } from "../structure/mod.ts";
-import { Blender, BlendShader, CompositeMethod } from "jsr:@maemon4095/imagedata-blender-gl";
+import { Blender, BlendShader, CompositeMethod } from "jsr:@maemon4095/imagedata-blender-gl@0.1";
 
 export function blendTo(blender: Blender, ps: Photoshop, dx: number, dy: number) {
     const layers = ps.layers;
@@ -25,7 +25,9 @@ export function blendTo(blender: Blender, ps: Photoshop, dx: number, dy: number)
 export function render(ps: Photoshop): ImageData {
     const blender = new Blender(ps.width, ps.height);
     blendTo(blender, ps, 0, 0);
-    return blender.createImageData();
+    const image = blender.createImageData();
+    blender.cleanUp();
+    return image;
 }
 
 function getBlendShader(blendMode: BlendMode): undefined | BlendShader {
