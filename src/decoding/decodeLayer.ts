@@ -1,5 +1,5 @@
 import { PhotoshopFile, ColorMode, LayerRecords, ImageChannel } from "../parse/mod.ts";
-import { decodeImageChannel } from "./channel.ts";
+import { decodeImageChannel } from "./decodeImageChannel.ts";
 import { ParseContext } from "../util/parse/mod.ts";
 
 export function decodeLayer(file: PhotoshopFile, layer: LayerRecords, channels: ImageChannel[]): null | ImageData {
