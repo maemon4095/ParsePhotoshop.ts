@@ -1,0 +1,40 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+canvas {
+    min-width: 0;
+    min-height: 0;
+}
+
+.flex {
+    display: flex;
+}
+
+.bg-blank {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsAAAA7AAWrWiQkAAACPSURBVFhH7ZU7CgUhDEVvRN2MpfuvLMQFuBl/80bIBozFFC8HgpIiHjUQSik9ELDWgvceMUY45zh7juH1M1RABVRABVRABcyeajdBRFxKBuWcr8ZxCAHWWs6eQ601kcBmjIFaK3rv4peg54X3x8w5UUrBewkYI2unqybc37APvgqu9RkqoAIqoAIq8O8CwA/vaVm5b5/yDQAAAABJRU5ErkJggg==");
+    animation: 1s linear infinite bg-blank-animate;
+}
+
+.ps-structure-node {
+    cursor: pointer;
+}
+
+.ps-structure-node[data-visible=false] {
+    opacity: 0.3;
+}
+
+@keyframes bg-blank-animate {
+    from {
+        background-position: 0px 0px;
+    }
+
+    to {
+        background-position: 32px 32px;
+    }
+}
