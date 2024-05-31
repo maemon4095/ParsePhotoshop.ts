@@ -1,6 +1,7 @@
 import { h, VNode } from "../deps/preact.ts";
 import {
   useEffect,
+  useMemo,
   useReducer,
   useRef,
   useState,
@@ -12,12 +13,18 @@ import {
   Photoshop,
 } from "../deps/structure.ts";
 import parsePhotoshopFile from "../deps/parse.ts";
-import { render } from "../deps/draw.ts";
+import { createRenderer } from "../deps/draw.ts";
 import { PhotoshopFile } from "../deps/parse.ts";
 import { PhotoshopNode } from "../deps/structure.ts";
 export default function View({ file }: { file: File }) {
-  const ps = useRef<{ file: PhotoshopFile; structure: Photoshop }>();
+  const [ps, setPs] = useState<
+    { file: PhotoshopFile; structure: Photoshop }
+  >();
   const [version, setVersion] = useState(0);
+  const renderer = useMemo(() => {
+    if (!ps) return;
+    return createRenderer(ps.structure.width, ps.structure.height);
+  }, [ps]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -42,7 +49,7 @@ export default function View({ file }: { file: File }) {
       const buffer = await file.arrayBuffer();
       const psf = parsePhotoshopFile(buffer);
       const structure = constructPhotoshopStructureFrom(psf);
-      ps.current = { file: psf, structure };
+      setPs({ file: psf, structure });
       setVersion((t) => t + 1);
     })();
   }, []);
@@ -54,11 +61,12 @@ export default function View({ file }: { file: File }) {
   });
 
   useEffect(() => {
-    if (!ps.current) return;
+    if (!ps) return;
     const canvas = canvasRef.current!;
-    canvas.width = ps.current.structure.width;
-    canvas.height = ps.current.structure.height;
-    const imageData = render(ps.current.structure);
+    canvas.width = ps.structure.width;
+    canvas.height = ps.structure.height;
+    const imageData = renderer!.render(ps.structure, 0, 0);
+    console.log(imageData);
     const ctx = canvas.getContext("2d")!;
     ctx.putImageData(imageData, 0, 0);
     onResize();
@@ -81,9 +89,9 @@ export default function View({ file }: { file: File }) {
         h(
           "div",
           { style: "overflow: auto;" },
-          !!(ps.current) &&
+          !!ps &&
             h(Structure, {
-              node: ps.current.structure,
+              node: ps.structure,
               onupdate: () => setVersion((t) => t + 1),
             }),
         ),

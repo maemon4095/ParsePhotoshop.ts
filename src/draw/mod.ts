@@ -30,6 +30,21 @@ export function render(ps: Photoshop): ImageData {
     return image;
 }
 
+export type Renderer = {
+    render(ps: Photoshop, dx: number, dy: number): ImageData;
+};
+
+export function createRenderer(width: number, height: number) {
+    const blender = new Blender(width, height);
+    function render(ps: Photoshop, dx: number, dy: number) {
+        blendTo(blender, ps, dx, dy);
+        const data = blender.createImageData();
+        blender.clear();
+        return data;
+    }
+    return { render };
+}
+
 function getBlendShader(blendMode: BlendMode): undefined | BlendShader {
     switch (blendMode) {
         case BlendMode.Unknown:
