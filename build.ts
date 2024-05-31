@@ -1,7 +1,10 @@
 import ts from "npm:typescript";
-import * as fs from "https://deno.land/std@0.224.0/fs/mod.ts";
+import * as fs from "jsr:@std/fs";
+import * as path from "jsr:@std/path";
 import { transform, SourceGenerator } from "https://raw.githubusercontent.com/maemon4095/SourceGenerator.ts/main/mod.ts";
 import { TrieGenerator } from "./tools/GenerateTrie/mod.ts";
+import * as esbuild from "npm:esbuild";
+import { denoPlugins } from "jsr:@luca/esbuild-deno-loader";
 
 const mode = Deno.args[0];
 
@@ -16,14 +19,14 @@ const generatedFileHeader = `/*
 
 const srcDir = "./src";
 
-for await (const entry of fs.expandGlob(`${srcDir}/**/*.gen.ts`)) {
+for await (const entry of fs.expandGlob(`${srcDir}/**/*.gen.{ts,js}`)) {
     if (!entry.isFile) continue;
     await Deno.remove(entry.path);
 }
 
 switch (mode) {
     case "build": {
-        await generateAll((async function* () {
+        await transformAll((async function* () {
             for await (const e of fs.walk(srcDir)) {
                 yield e.path;
             }
@@ -31,7 +34,7 @@ switch (mode) {
         break;
     }
     case "watch": {
-        await generateAll((async function* () {
+        await transformAll((async function* () {
             for await (const e of fs.walk(srcDir)) {
                 yield e.path;
             }
@@ -43,14 +46,43 @@ switch (mode) {
     }
 }
 
-async function generateAll(paths: AsyncIterable<string>) {
-    const pattern = /^.*\.src\.ts$/;
-    for await (const path of paths) {
-        if (!path.match(pattern)) {
-            continue;
-        }
-        await generate(path);
+
+
+async function transformAll(paths: AsyncIterable<string>) {
+    const sources: string[] = [];
+    for await (const p of paths) {
+        sources.push(p);
     }
+
+    const generateSourcePattern = /^.*\.src\.ts$/;
+    const workerSourcePattern = /^.*\.worker\.ts$/;
+    for (const path of sources) {
+        if (path.match(generateSourcePattern)) {
+            await generate(path);
+        }
+    }
+    for (const path of sources) {
+        if (path.match(workerSourcePattern)) {
+            await bundleWorker(path);
+        }
+    }
+}
+
+async function bundleWorker(p: string) {
+    const { outputFiles } = await esbuild.build({
+        entryPoints: [p],
+        bundle: true,
+        format: "esm",
+        write: false,
+        minify: true,
+        treeShaking: true,
+        plugins: [
+            ...denoPlugins({ configPath: path.join(import.meta.dirname!, "./deno.json") })
+        ]
+    });
+    const filepath = p.substring(0, p.length - 3) + ".gen.js";
+    const content = outputFiles[0].text;
+    await Deno.writeTextFile(filepath, content);
 }
 
 async function generate(path: string) {
