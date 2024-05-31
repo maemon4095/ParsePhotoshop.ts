@@ -20,11 +20,6 @@ onmessage = (e: MessageEvent<Request>) => {
                 data
             };
             postMessage(message);
-            break;
-        }
-        default: {
-            console.log(e.data);
-            throw new Error("Unrecognized request.");
         }
     }
 };

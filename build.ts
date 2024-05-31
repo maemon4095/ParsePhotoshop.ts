@@ -19,7 +19,7 @@ const generatedFileHeader = `/*
 
 const srcDir = "./src";
 
-for await (const entry of fs.expandGlob(`${srcDir}/**/*.gen.ts`)) {
+for await (const entry of fs.expandGlob(`${srcDir}/**/*.gen.{ts,js}`)) {
     if (!entry.isFile) continue;
     await Deno.remove(entry.path);
 }
@@ -80,12 +80,9 @@ async function bundleWorker(p: string) {
             ...denoPlugins({ configPath: path.join(import.meta.dirname!, "./deno.json") })
         ]
     });
-    const filepath = p.substring(0, p.length - 3) + ".gen.ts";
+    const filepath = p.substring(0, p.length - 3) + ".gen.js";
     const content = outputFiles[0].text;
-    const workerDataUrl = "data:text/javascript;base64," + btoa(content);
-    const source = `export default function create(): Worker { return new Worker(${JSON.stringify(workerDataUrl)}); }`;
-
-    await Deno.writeTextFile(filepath, source);
+    await Deno.writeTextFile(filepath, content);
 }
 
 async function generate(path: string) {
