@@ -12,7 +12,7 @@ import {
   Photoshop,
 } from "../deps/structure.ts";
 import parsePhotoshopFile from "../deps/parse.ts";
-import { render } from "../deps/draw.ts";
+import { renderSync } from "../deps/draw.ts";
 import { PhotoshopFile } from "../deps/parse.ts";
 import { PhotoshopNode } from "../deps/structure.ts";
 export default function View({ file }: { file: File }) {
@@ -58,7 +58,7 @@ export default function View({ file }: { file: File }) {
     const canvas = canvasRef.current!;
     canvas.width = ps.current.structure.width;
     canvas.height = ps.current.structure.height;
-    const imageData = render(ps.current.structure);
+    const imageData = renderSync(ps.current.structure);
     const ctx = canvas.getContext("2d")!;
     ctx.putImageData(imageData, 0, 0);
     onResize();
